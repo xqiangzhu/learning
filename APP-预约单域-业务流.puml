@@ -1,0 +1,78 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 预约单域 APP 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.2 / §4 / §7
+' 说明：fork 表示"独立路径/分支"，不代表真实并发调用；
+'       联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       报销主责在预约单域，即便接口由支撑层转发也不迁回订单域
+' ============================================================
+title 预约单域 APP 业务流\n<size:12>创建 → 改期/取消/机构路由 → 到检 → 评价/满意度/报销</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:APP-01 预约创建与防重\ncustomerAppointment · @NoRepeatedSubmit + @Lock\n持有人 OrderHolderBean / 到检人与订单关联;
+note right
+  → ORD-01 交易主子单
+  → BEN-01/02 可预约权益校验
+end note
+:APP-03 预约日期与购物车联动\nupdateShoppingCartAppointmentDate\n体检端购物车排期容量与改期日期;
+note right
+  ←→ SKU-02 商城购物车 / SKU-04 体检购物车
+  （两条实现链，不能假定同一表）
+end note
+fork
+  :APP-02 门店/排期、改期与取消\nvalidateCancelAppointmentDay · 客服例外\n线上线下互转 · 释放机构号源;
+  note right
+    → SUP-01 机构门店/号源
+    → PRO-01 套餐
+    → ORD-04 交易退款
+    → BEN-02 权益
+    Q6 取消时序待核
+  end note
+fork again
+  :APP-06 机构预约策略与锁号/取消/到检\n按机构类型路由 · appkey/套餐编码适配\n调用机构预约/取消/改期/结果查询;
+  note right
+    ←→ SUP-01 机构协议与密钥
+    物理承载在基础层，不构成业务域
+  end note
+end fork
+:APP-04 机构预约结果回传\naiKangNotify（预约部分）· 预约结果/状态更新;
+note right
+  ← SUP-03 对接/协议
+  同回调中的报告数据 → ARC-01
+end note
+:APP-05 到检状态与后台批量预约\n批量导入校验/创建 · 到检确认\n定时状态更新 · 异常预约清理;
+note right
+  ← ORD-03 支付结果为状态前置
+  → RPT-02 到检率统计（口径待核 Q8）
+  调度器/消息 = T04 依赖
+end note
+fork
+  :APP-08 门店评价（依附预约）\n评分维度/标签配置 · addStoreEvaluation\n按门店/项目评价查询;
+  note right
+    业务方已确认：依附某次预约
+    → SUP-01 门店/项目信息
+  end note
+fork again
+  :APP-09 满意度调查（到检后反馈）\n完成体检后发送调查邮件/短信 · 结果归集;
+  note right
+    业务方已确认归预约单域
+    发送框架 = T04
+  end note
+fork again
+  :APP-07 体检相关报销\nEWP23 体检 / EWP100 流感 / EWP102 积分\n申请 → 校验 → 审核 → 代付 → 同步核心;
+  note right
+    业务方已确认归预约单域
+    → BEN-04 积分影响
+    → ORD-04 取消联动回退
+    ≠ 退款 ORD-04 · ≠ 理赔 FUL-04
+    渠道/MIS 同步出口 = T02
+  end note
+end fork
+stop
+@enduml

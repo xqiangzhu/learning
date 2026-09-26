@@ -1,0 +1,27 @@
+@startuml
+' ============================================================
+' 积分商城购买 / 兑换（商品域 × 权益域 × 订单域）
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§4 / §7（G01/G17/G26/G48）
+' 说明：评审路径示意，非已证实时序；积分账本与清结算独立承载，
+'       权益域只做资格/核销/查询入口
+' ============================================================
+title 积分商城购买 / 兑换\n<size:12>评审路径示意（依据 §4 / G01 / G17 / G26，非已证实时序）</size>
+skinparam defaultFontName "Microsoft YaHei"
+
+actor 用户 as U
+participant "商品域\nSKU" as SKU
+participant "预约单域\nAPP" as APP
+participant "权益域\nBEN" as BEN
+participant "订单域\nORD" as ORD
+
+U -> SKU : 选购 / 加购物车（SKU-01/02）\naddShoppingCart · 推荐位
+SKU -> APP : 体检类关联预约日期（APP-03）\n（商城 SKU-02 与体检 SKU-04 两条实现链）
+U -> ORD : 结算 / 下单（ORD-02）\ncommonBuildOrder → 商城主/子单
+ORD -> BEN : 积分查询 / 冻结（BEN-04）\n（账本与清结算独立承载）
+ORD -> BEN : 支付金额试算（ORD-03 + BEN-02/04）
+U -> ORD : 支付 / 合并支付 / 回调（ORD-03）
+note over SKU, ORD : 积分兑换选品从商品流\n进入权益及交易流（SKU-03）
+U -> ORD : 取消 / 退款（ORD-04）
+ORD -> BEN : 积分回退 / 补偿（BEN-04）
+note right of BEN : 抽奖实物奖品 → ORD-02\n虚拟奖品 → BEN-06（ACT-03 联动）
+@enduml
