@@ -1,0 +1,68 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 档案域 ARC 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.7 / §4 / §7
+' 说明：联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       档案域管个人体检报告及健康记录的归集/解析/查询/解读/展示，
+'       含健康测评结果（问卷、规则引擎输出、测评历史）
+'       “体检报告”是档案数据，不是“经营报表”；查询聚合不等于
+'       拥有各下游原始病历或测评引擎的物理数据
+' ============================================================
+title 档案域 ARC 业务流\n<size:12>报告归集 → OCR/结构化解析 → 查看解读 → 线下任务 → 健康记录 → 测评</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:ARC-01 体检报告接收与归集\n机构回传/用户自主上传 → EwpUserReportBean\n机构报告可按预约拉取并补齐既往报告;
+note right
+  SUP-03 管外部协议
+  APP-04 管预约结果
+  报告进入档案，不进经营报表域
+end note
+fork
+  :ARC-02 OCR、报告状态与重试/清理\nEwpReportToOcrLogBean / EwpPastReportBean\n状态 00 未解析/01 成功/02 失败 · 轮询 · 失败重拉\n过期报告清理及定时 OCR 推送;
+  note right
+    APP-05 的到检状态可能影响报告可取状态
+    OCR/清理的调度模块不改变档案所有权
+    保留期限须另核
+  end note
+fork again
+  :ARC-06 机构结构化报告获取与解析\n获取机构 JSON · 反序列化为结构化体检指标\n标准化成报告/OCR结构，供电子档案与下游报告推送;
+  note right
+    SUP-03 负责机构访问协议
+    APP-05 提供到检状态依据
+    ARC-02 负责 OCR/失败重试
+    档案不自动拥有机构用户身份主数据
+  end note
+end fork
+:ARC-03 报告查看、员工/家属归属与体检报告解读\nreportTarget 01 员工/02 家属 · 历年报告列表\n解读申请/结果/阅读提醒及失败补偿;
+note right
+  APP 的持有人关系需对照访问权限
+  肿瘤指标医疗解读作为服务履约归 FUL-03
+  其报告附件/结果联本流，不与一般解读混同
+end note
+:ARC-04 线下报告任务/MIS 批量录入与下载\nofflineReport · queryReportTaskList · disposeZipReport\nbatchSaveReport / downloadOfflineReport;
+note right
+  原文置于 MIS，但处理的是体检报告文件/任务
+  不因带“报告”或后台模块而归 RPT
+end note
+:ARC-05 健康记录聚合与健康史维护\n问诊/送药记录 · HRA 历史与测评链接 · 健康史查询/更新\n体检报告与线下医疗记录查询 · 报告所属客户关联;
+note right
+  经 ICoreService 聚合下游
+  问卷生产/测评引擎在 ARC-07
+  问诊/送药实际履约在 FUL-02
+  建档客户身份映射另看 U01 九域外
+end note
+:ARC-07 健康测评（结果归档案）\n问卷题目查询/绑定/作答 · 规则引擎计算评估结果（原 Drools，已替换 Groovy）\n测评历史与测评订单结果查询 · 第三方测评转发;
+note right
+  业务方已确认归档案域
+  规则引擎是档案域的测评能力而非独立域
+  测评产生的积分由 BEN-04 消费
+  测评结果进健康记录 ARC-05 · 转发入口本身是技术
+end note
+stop
+@enduml

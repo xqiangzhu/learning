@@ -1,0 +1,75 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 权益域 BEN 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.3 / §4 / §7
+' 说明：fork 表示"独立路径/分支"，不代表真实并发调用；
+'       联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       权益域管"有没有资格、核销没核销"；积分账本与清结算独立承载，
+'       权益域只做资格/核销/查询入口；核销后的实际服务交付归履约域
+' ============================================================
+title 权益域 BEN 业务流\n<size:12>团单/组别 → 资格核验 → 福利/积分/激活/卡券 → 到期提醒与使用状态</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:BEN-01 团单本体/组别配置与权益查询\nqueryTeamOrderConfig / queryBenefitsTeamOrderList / queryEffTeamOrder\n按工号、团单号、组别号取员工/家属有效权益（01-团单/02-个单）;
+note right
+  业务方已确认：团单归权益域
+  原文与图谱仅证明查询/配置/后台入口
+  创建/变更生命周期状态机待补证据，不虚构
+end note
+:BEN-02 资格核验与额度使用\n预约和渠道免密入口的先验权益校验\n产品包“是否免费/公司额度可用”与实际权益可用性的衔接;
+note right
+  → APP-01/02 消费核验结果
+  → PRO-01 定义产品包可用规则
+  免登 token 签发仍属 U01 九域外
+end note
+fork
+  :BEN-03 渠道积分权益使用/撤销联动\n第三方积分权益下单前的资格与占用\n取消订单时核对积分/权益回退;
+  note right
+    交易下单/取消/结果查询归 ORD-01/04
+    账本回滚实现未细述，不推断具体补偿机制
+  end note
+fork again
+  :BEN-04 企业福利与积分查询/冻结/返还（入口）\n按员工/部门发放积分或商品额度\nqueryIntegral / freezeIntegral · 兑换前冻结;
+  note right
+    业务方已确认：积分账本与清结算独立承载
+    ←→ SKU-01 商品 · ORD-02/03/04 兑换交易与退款
+    ← ACT-03 奖品发放 · ARC-07 测评积分消费
+  end note
+fork again
+  :BEN-05 健康金/权益激活与私人管家权益核销\nactivateService / activateRights / queryRights\ncmbOrderRedeem · CmbCardOrderDTO 作为激活/核销基线;
+  note right
+    业务方已确认：激活单是权益过程对象，非交易订单
+    真正销售/退款才联动 ORD
+    管家实际履约 → FUL-02 · 补地址 ORD-08
+  end note
+fork again
+  :BEN-06 卡券/卡密与增值服务使用权\n卡券码激活 · 卡礼包/卡密生成与兑换 · 短信验证\n权限/日期/次数校验 · 增值服务列表与使用人授权;
+  note right
+    核销/使用权归权益域，实际服务履约 → FUL-02
+    子包产品定义 PRO-02 · 订单取消 ORD-04
+    认证账户 U01 九域外
+  end note
+end fork
+fork
+  :BEN-07 权益到期与免费额度提醒\nrightsReminder · 免费权益数查询\n报告到达与福利到期邮件分别追溯档案/权益触发;
+  note right
+    健康测评提醒在 ARC-07
+    消息投递框架 = T04
+    不要把所有短信/邮件归活动域
+  end note
+fork again
+  :BEN-08 权益/加值包使用状态与一次性使用规则\nupdatePacket / updateExpacket · checkBenefitOnlyUsedOnce\n次数校验及取消前“未使用”判断;
+  note right
+    套餐互斥/加项定义在 PRO-05
+    ORD-04 取消退款需检查权益使用状态
+    APP-02 门店量/号源不是权益次数
+  end note
+end fork
+stop
+@enduml

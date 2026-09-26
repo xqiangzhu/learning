@@ -1,0 +1,40 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 报表域 RPT 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.9 / §4 / §7
+' 说明：联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       报表域管经营/管理数据的统计查询、导出与分发
+'       图谱只给指标名称，没有公式、定义与数据血缘，不创造 KPI 口径
+'       体检报告任务/文件下载不在此域（归 ARC-04）
+' ============================================================
+title 报表域 RPT 业务流\n<size:12>涉敏导出与审计 · 基础/团队数据与到检率 · 员工权益下载与邮件</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:RPT-01 涉敏业务数据导出与审计\nExportSensitiveServiceTemplate 策略选择 · 分布式锁+Cursor 流查\n脱敏 · EasyExcel · DLP 导出日志及超量拒绝;
+note right
+  源域 ORD/APP/BEN 保留数据口径
+  通用预约/订单/理赔 DLP 采集为跨域技术 T03
+  体检报告文件下载仍归 ARC-04
+  不要把全部 DLP 场景归报表
+end note
+:RPT-02 基础/团队数据与到检率统计\nqueryBaseDataList / queryTeamDataList /\nqueryAppointToCheckRate;
+note right
+  APP-05 负责到检事实与预约状态
+  统计口径、去重窗口及数据来源图谱未给出
+  评审前需确认（Q8），不创造 KPI 口径
+end note
+:RPT-03 员工权益/信息下载与报表邮件\ndownloadEmployInfo · HR/审计导出邮件发送;
+note right
+  BEN-01 拥有权益源数据
+  U01 拥有员工敏感主数据（九域外）
+  对外交付与脱敏/审批联 RPT-01/T03
+  通用通知邮件不在此流
+end note
+stop
+@enduml

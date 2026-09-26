@@ -1,0 +1,37 @@
+@startuml
+' ============================================================
+' 体检预约 → 建单 → 支付 主链路（预约单 × 订单 × 权益 × 产品 × 供应商）
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§4 行1 / G27·G43—G48
+' 说明：评审路径示意，非已证实时序；消息旁标注流 ID 与评审检查点，
+'       不表示已证明存在该同步调用；
+'       取消/退款与报销联动见《SEQ-退款取消与报销联动》
+' ============================================================
+title 体检预约 → 建单 → 支付 主链路\n<size:12>评审路径示意（依据 §4 行1 / G43 / G47 / G62 / G63，非已证实时序）</size>
+skinparam defaultFontName "Microsoft YaHei"
+
+actor 用户 as U
+participant "产品域\nPRO" as PRO
+participant "权益域\nBEN" as BEN
+participant "预约单域\nAPP" as APP
+participant "供应商域\nSUP" as SUP
+participant "订单域\nORD" as ORD
+
+U -> PRO : 浏览套餐/加项/升级包（PRO-01）\nqueryStaffMemberPacketListNew · 体检类00/非体检类01
+PRO -> BEN : 产品包可用规则衔接（BEN-02）\n是否免费/公司额度可用 与 实际权益可用性
+U -> APP : 提交体检预约（APP-01）\ncustomerAppointment · @NoRepeatedSubmit + @Lock
+APP -> BEN : 预约参数与资格核验（BEN-02）\nG43② 参数与权益校验
+APP -> SUP : 门店排期与容量校验（SUP-01）\nG43③ 门店容量与限制
+APP -> ORD : 建单（ORD-01）\nbuildOrderNew → EwpOrderMainBean 主子单 + 持有人
+ORD -> BEN : 积分支付资格与金额试算（BEN-04/02）\nG47② · G62① 支付金额试算与额度
+ORD -> APP : 订单事件 → 发布预约并锁号（APP-06）\nG47⑧ · G43⑥
+APP -> SUP : 机构预约策略路由（SUP-01）\nG27①—③ appkey 校验与套餐编码转换
+U -> ORD : 支付（ORD-03）\npayment-url 支付链接 → payment-notify 成功回调
+ORD -> APP : 支付成功联动预约状态（APP-05）\nG63① · 支付结果为到检状态前置
+note over U, ORD
+  评审路径示意（依据 §4 行1 / G43 / G47 / G62 / G63），非已证实时序
+  从体检购物车发起时加查：SKU-04 体检购物车 / APP-03 预约日期联动
+  套餐互斥与加项规则：PRO-05（G47⑤，扣减检查 BEN-08）
+  收货地址快照：ORD-08（只存快照，U01 九域外）
+  取消/退款与报销联动：见 SEQ-退款取消与报销联动（Q6 待核）
+end note
+@enduml

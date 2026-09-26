@@ -1,0 +1,33 @@
+@startuml
+' ============================================================
+' 订单取消/退款 与 报销联动（Q6 接缝）
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.1/§3.2/§5.5
+' 说明：评审路径示意，非已证实时序。
+'       Q6：取消预约/订单时，预约域报销撤销、权益积分回退与订单退款
+'       由谁发起、如何补偿与对账——归属已确认，协同时序尚未证明
+' ============================================================
+title 订单取消 / 退款 与 报销联动\n<size:12>评审路径示意（依据 §5.5 Q6 / G50 / G63 / G64 / G66，非已证实时序）</size>
+skinparam defaultFontName "Microsoft YaHei"
+
+actor "用户/MIS" as U
+participant "预约单域\nAPP" as APP
+participant "供应商域\nSUP" as SUP
+participant "订单域\nORD" as ORD
+participant "权益域\nBEN" as BEN
+participant "履约域\nFUL" as FUL
+
+U -> APP : 取消预约（APP-02）\nvalidateCancelAppointmentDay · 客服例外
+APP -> SUP : 供应商预约取消、释放机构号源（SUP-01）\nG45④ 线上线下互转协调
+APP -> ORD : 如已支付 → 订单取消（ORD-04）\nG50① 线下取消校验 · 由谁发起 Q6 待核
+ORD -> BEN : 增值包未使用校验 + 积分/权益回退（BEN-08/04）\nG50②④ · 回滚实现源文档未细述，不推断
+ORD -> APP : 报销协同回退（APP-07）\nG50④ · G66③ 报销同步 HMC
+ORD -> U : 取消支付与退款申请（ORD-04）\ncommonRefundList / updateRefundService
+note over ORD, BEN : 退款异步回调 / 积分退款任务（G63② / G64②③）\n补偿与对账机制 Q6 待核
+U -> FUL : 如涉及理赔 → 理赔授权与状态（FUL-04）\nG75⑤ SWP 理赔 · 外部理赔登录跳转
+note right of FUL : 边界红线（三条状态机分开审）\n报销 APP-07 ≠ 退款 ORD-04 ≠ 理赔 FUL-04\ngRPC 仅接口契约 T02 · 实名认证 U01 九域外
+note over U, FUL
+  Q6（下一轮优先答复）：体检/商城/行方订单是否为不同聚合？
+  预约单与交易单如何关联？取消时报销撤销、积分回退、退款
+  由谁发起、如何补偿与对账？——归属已确认，协同时序尚未证明
+end note
+@enduml

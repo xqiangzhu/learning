@@ -1,0 +1,47 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 商品域 SKU 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.6 / §4 / §7
+' 说明：联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       商品域管商城商品的发现、选购与购物车；交易建单转交订单域
+'       产品包不因出现在商城就自动变成商品主数据
+' ============================================================
+title 商品域 SKU 业务流\n<size:12>展示/推荐/选购 → 购物车（商城/体检两条链）→ 结算交接</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:SKU-01 商城展示/推荐位/选购\n商品浏览 · Top 医生/医院推荐配置及多端查询 · 体检类商品选购;
+note right
+  PRO-01 提供套餐定义
+  机构展示信息联 SUP-01
+  商城订单进入 ORD-02
+  通用新闻公告归活动域 ACT-05 而非商品
+end note
+fork
+  :SKU-02 购物车增删改查\naddShoppingCart · queryShoppingCartList · deleteShoppingCart\n商品项数量调整;
+  note right
+    体检商品的购物车预约日期联动 APP-03
+    购物车不是已生成的交易订单
+  end note
+fork again
+  :SKU-04 体检类购物车\n体检端 addShoppingCart / queryShoppingCartList / 编辑体检人\ncheckShoppingCart · 多项合并下单前排期容量检查;
+  note right
+    与商城购物车 SKU-02 是两条实现链，不能假定同一表
+    容量归 APP-02
+    合并订单与预约归 ORD-01/APP-01
+    支付结果归 ORD-03
+  end note
+end fork
+:SKU-03 商品到结算的交接\n选购/购物车/体检类日期组合进入结算\n积分兑换选品从商品流进入权益及交易流;
+note right
+  APP-03 关注日期 · BEN-04 关注积分冻结
+  ORD-02/03 关注建单支付
+  本流不拥有支付回调
+end note
+stop
+@enduml

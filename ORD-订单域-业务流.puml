@@ -1,0 +1,73 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 订单域 ORD 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.1 / §4 / §7
+' 说明：fork 表示"独立路径/分支"，不代表真实并发调用；
+'       联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       三套订单体系（体检/商城/行方生活端）共用评审入口，
+'       不据此合并实体、表或聚合
+'       ORD-06 曾暂挂"报销"，已迁预约单域 APP-07，原编号停用且不复用
+' ============================================================
+title 订单域 ORD 业务流\n<size:12>建单（体检/商城）→ 支付 → 取消/退款 · 开票 · 查询物流 · 地址快照</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+fork
+  :ORD-01 体检交易建单/第三方代建\n预约接口生成 EwpOrderMainBean 主子单与持有人关联\nbuildOrderNew 链含支付单/主单/事件 · 临时单可代建三方主子单;
+  note right
+    ← APP-01/02 预约过程
+    ← BEN-02/03 资格与积分
+    前台体检购物车见 SKU-04
+    不合并不同上下文订单实体
+  end note
+fork again
+  :ORD-02 商城建单与拆单\ncommonBuildOrder / commonBuildOrderList 商城主/子单\n积分兑换交易 · 抽奖实物奖品履约订单按实际生成对象检查;
+  note right
+    ← SKU-01/02/03 选购与结算交接
+    ←→ BEN-04 积分冻结
+    ← ACT-03 实物奖品（仅生成订单时）
+    体检交易 ORD-01 仅共享评审域名，不推定共享聚合
+  end note
+end fork
+:ORD-03 支付、试算、合并支付、续付与回调\ncommonPay / commonPayList / commonNotifyPay\n体检 payment-url 与 payment-notify · 行方生活端回执 1000/1001;
+note right
+  ←→ BEN-02/04 支付金额试算
+  → APP-05 回调导致预约状态变化
+  行方登录令牌属 U01 九域外
+  体检支付与商城 G17 分链评估（G62—G64）
+end note
+fork
+  :ORD-04 订单取消、退款及状态同步\n渠道积分订单取消/结果查询 · commonRefundList / updateRefundService\n体检取消与增值包未使用校验 · 积分退款补偿 · MIS 批量退款;
+  note right
+    预约取消归 APP-02，此处仅交易侧
+    ←→ BEN-04/08 权益/积分回退
+    ≠ 报销 APP-07 · ≠ 理赔 FUL-04
+    下游同步出口 = T02 · Q6 协同时序待核
+  end note
+fork again
+  :ORD-05 开票\n可开票查询/申请 · 容量锁定 · 订单开票校验\n税头/额度 · 发票状态机 · 重传与 queryInvoiceStatus 定时轮询;
+  note right
+    业务方已确认归订单域
+    图谱旧挂"福利权益与卡密"为历史承载，不改变主责
+  end note
+fork again
+  :ORD-07 订单列表/详情、渠道状态与物流\n渠道按第三方单号查询 · 体检订单与临时单/加值项查询\n第三方供方订单状态更新 · queryAndUpdateExpress 物流;
+  note right
+    ← SUP-05 供方协议/映射
+    权益项定义仍归 BEN/PRO
+    收货地址见 ORD-08
+  end note
+end fork
+:ORD-08 收货地址快照\n商城地址 · 行方核销补地址 · 体检报告寄送地址 · 收货信息同步;
+note right
+  业务方已确认：订单只持有地址快照
+  通用地址簿主数据在 U01（九域外）
+  地址仅与订单/报告寄送相关
+end note
+stop
+@enduml

@@ -1,0 +1,53 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 活动域 ACT 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.8 / §4 / §7
+' 说明：联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       活动域管营销活动的配置和参与，含通用渠道配置与新闻公告/广告内容
+'       不等于所有渠道接入、企业福利或行方合作
+' ============================================================
+title 活动域 ACT 业务流\n<size:12>活动配置/参与 → 渠道投放 → 抽奖 → 通用渠道配置 · 公告广告</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:ACT-01 活动配置与参与\n后台配置活动上下架/规则/库存\n用户参与与领取明细;
+note right
+  核对变更是否影响商品展示、积分福利与下单条件
+  ←→ SKU-01 · BEN-04 · ORD-02 按实际活动规则联动
+  没有具体优惠算法或指标口径，不补造
+end note
+:ACT-02 活动渠道投放\n活动与商品的渠道投放参数 · 活动投放规则归此流;
+note right
+  商品渠道上架联 SKU-01
+  通用渠道主数据/免登/密钥见 ACT-04
+  身份签发在 U01 九域外
+end note
+:ACT-03 抽奖营销活动\n运营配置抽奖规则/奖品/库存\n用户抽奖与中奖记录 · 奖品发放/核销;
+note right
+  虚拟奖品成为权益时联 BEN-04/06
+  实物生成履约订单时联 ORD-02
+  不假定所有中奖都经支付（Q8 口径待核）
+end note
+fork
+  :ACT-04 通用渠道配置\n渠道主数据 · 密钥 · 免登/路由 · 多渠道 SSO\n与未知业务回调的配置;
+  note right
+    业务方已确认归活动域
+    商品投放配置联 SKU-01
+    token 签发/身份归属 U01 九域外
+    未知回调按载荷再归对象域
+  end note
+fork again
+  :ACT-05 新闻公告/广告内容运营\nMIS 推荐位/资讯配置中的\nNewsController / EwpBulletinController / AdvertController;
+  note right
+    业务方已确认归活动域
+    医生/医院商品推荐位联 SKU-01
+    供应商资料联 SUP-01
+  end note
+end fork
+stop
+@enduml

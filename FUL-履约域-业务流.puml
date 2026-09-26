@@ -1,0 +1,54 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 履约域 FUL 业务流概览（V0.4 新增，第十域）
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.10 / §4 / §7
+' 说明：联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       履约域只管"已核销/已申领后的实际服务交付"
+'       不承接：资格与核销（权益域）、交易与支付（订单域）、
+'       预约到检（预约单域）、报告解读自动提交与 OCR（档案域）、测评（档案域）
+' ============================================================
+title 履约域 FUL 业务流\n<size:12>核销/申领之后 → 咨询 · 送药/管家 · 肿瘤解读 · 理赔保单 · 服务单</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:FUL-01 医疗咨询与远程医疗履约\n导医在线咨询（科室列表、提问转发大数据平台）\n处方审核/隐私虚拟号/服务跳转;
+note right
+  咨询项目产品定义在 PRO-06
+  供方适配在 SUP-02
+  咨询产生的健康记录查询在 ARC-05
+  HIS 对接（虚拟号与处方审核）G34③
+end note
+:FUL-02 送药/私人管家/增值服务履约\n送药记录创建与去重 · 送药申请查询\n私人管家核销后的实际服务 · 增值服务实际服务与授权;
+note right
+  权益核销入口在 BEN-06/08
+  服务单附件/步骤见 FUL-05
+  送药/健康记录查询在 ARC-05
+  补收货地址归 ORD-08
+end note
+:FUL-03 肿瘤标志物解读服务\n肿瘤指标医疗解读的提交/结果;
+note right
+  解读服务履约归履约域
+  解读结果/报告附件联档案域 ARC-03
+  不混同一般体检报告解读
+end note
+:FUL-04 保险理赔与保单\n渠道理赔授权/数据 · SWP 理赔查询与落库\n外部理赔登录跳转 · 会员 gRPC 理赔报告/理赔进程\n保单列表/详情/绑定 · 退保试算;
+note right
+  ≠ 体检报销 APP-07 ≠ 退款 ORD-04
+  gRPC 只是接口契约 T02
+  保单绑定涉及的实名认证在 U01 九域外
+end note
+:FUL-05 服务单本体与实施步骤\n服务单文件上传（服务单/处方附件）\n下游 syncServiceStep 服务实施步骤同步\n供应商迁移中的服务单列表/取消/实施步骤;
+note right
+  业务方已确认归履约域
+  服务单是履约聚合，与交易订单 ORD、权益核销 BEN 分离
+  同步出口本身是 T02
+  边界红线：预约到检 APP · 报告 OCR ARC-02/03
+  测评 ARC-07 · 交易支付 ORD 均不进履约域
+end note
+stop
+@enduml

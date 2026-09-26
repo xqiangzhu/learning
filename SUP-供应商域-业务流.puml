@@ -1,0 +1,54 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 供应商域 SUP 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.4 / §4 / §7
+' 说明：联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       接入回传中"预约结果/健康报告/订单状态"的业务数据归对应业务域
+'       SUP-04（门店评价）原编号停用且不复用，已迁预约单域 APP-08
+'       导医咨询项目产品定义归产品域 PRO-06，本域只保留供方适配
+' ============================================================
+title 供应商域 SUP 业务流\n<size:12>机构/门店主资料 → 供方适配 → 回传协议 → 供方订单/迁移适配</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:SUP-01 机构/门店主资料、策略路由与接入令牌\n机构编码和 appkey · 门店/地区列表 · 体检机构路由注册\n外部健康机构 token 更新/刷新;
+note right
+  门店可约排期/号源规则归 APP-02/06
+  套餐归 PRO-01
+  物理基础层不构成第十一域
+  机构直付医院列表仅作供方目录，理赔支付语义见 FUL-04
+end note
+:SUP-02 导医咨询项目供方适配\nqueryConsultProjectCodeList / queryConsultProjectConfig\nConsultProjectBean · 在线咨询按项目编码接入供方;
+note right
+  业务方已确认：产品化归产品域 PRO-06
+  此处仅保留机构/供方的项目编码适配
+  咨询内容与服务履约见 FUL-01
+end note
+:SUP-03 机构数据回传与报告拉取协议\naiKangNotify 等预约/报告回传接口的接入适配\n来源识别与机构报告拉取;
+note right
+  预约结果归 APP-04
+  报告内容归 ARC-01/06
+  不可仅因 URL 在机构 Controller 就把健康报告归供应商
+end note
+fork
+  :SUP-05 第三方供方订单接口适配\nsaveBuildOrderInfo / modifyOrderStatus 等供方交互的协议/映射;
+  note right
+    订单状态与物流业务仍在 ORD-07
+    “供方适配”不能替代交易订单所有者
+  end note
+fork again
+  :SUP-06 供应商侧数据迁移的适配入口\nIMigrateFeignClient / MigrateFeignHystrix;
+  note right
+    仅对接适配归供应商
+    迁移数据按对象：权益→BEN · 订单→ORD/APP
+    登录→U01 九域外 · 服务实施步骤→FUL-05
+    SUP-04 门店评价已停用，迁 APP-08
+  end note
+end fork
+stop
+@enduml

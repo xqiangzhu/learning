@@ -1,0 +1,58 @@
+@startuml
+' ============================================================
+' 体检平台十域 · 产品域 PRO 业务流概览
+' 来源：《10.体检平台十域-领域与业务流归类-需求评审版.md》§3.5 / §4 / §7
+' 说明：联动 = 评审时一起检查（文档原文口径，非已证实同步调用）
+'       产品域管套餐/产品包/子产品/项目定义与配置换算；
+'       是否能"使用"权益由权益域判断，商品上架与展示由商品域承担
+' ============================================================
+title 产品域 PRO 业务流\n<size:12>产品包/子产品/标准项目 → 积分产品包 · 互斥加项 · 导医咨询产品化</size>
+skinparam defaultFontName "Microsoft YaHei"
+skinparam ActivityBackgroundColor #EDF7ED
+skinparam ActivityBorderColor #3A7D44
+skinparam ActivityDiamondBackgroundColor #FDEBD0
+skinparam noteBackgroundColor #FFF8E1
+skinparam noteBorderColor #D9A514
+
+start
+:PRO-01 产品包列表、配置与产品规则\nqueryStaffMemberPacketListNew/Page · queryPackageConfigByProjectCode\n体检类00/非体检类01 · 免费规则 · 公司额度适用配置;
+note right
+  BEN-01/02 决定员工/家属是否有资格及额度
+  SKU-01 负责商品展示
+  APP-02 负责可约排期
+end note
+:PRO-02 子产品映射与产品包换算\nPackageWrapper · queryPackageConversion /\nqueryPackageConversionDetailList;
+note right
+  变更换算规则时复核权益占用
+  及订单中的产品快照是否受影响
+  原文没有字段层证据，不假设回写机制
+end note
+:PRO-03 标准体检项目配置\n后台 queryProjectConfig / editProjectConfig 经核心维护体检项目配置\nMIS ProjectConfigController 等提供管理入口;
+note right
+  业务方已确认归产品域
+  机构编码映射由 SUP-01 承担
+  导医咨询项目定义单独见 PRO-06，二者不再混同
+end note
+fork
+  :PRO-04 积分产品包清单\n第三方报销渠道与商城联动的积分产品包查询/配置;
+  note right
+    BEN-04 负责积分资格和可用额
+    APP-07 负责积分报销
+    SKU-01 负责上架展示（若确有该展示）
+  end note
+fork again
+  :PRO-05 套餐互斥与指定加项规则\ncheckPackageMutualNew / processAssignAdditionPackageRule\n决定产品组合及加项包配置;
+  note right
+    规则执行时扣减权益/更新使用次数由 BEN-08 检查
+    订单金额分摊由 ORD-01/03 检查
+  end note
+fork again
+  :PRO-06 导医咨询项目产品化\nConsultProjectBean 对应的咨询类项目作为可售产品主数据\n编码、定价、可售规则;
+  note right
+    业务方已确认产品化归产品域
+    机构/供方接入适配仍在 SUP-02
+    咨询服务履约见 FUL-01
+  end note
+end fork
+stop
+@enduml
