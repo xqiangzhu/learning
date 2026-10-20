@@ -66,3 +66,24 @@ java -jar tools/plantuml.jar -charset UTF-8 -o ./preview ORD-订单域-业务流
 - `Fxx`：源文档 §6 给原文 33 条流加的检索编号。
 - `Gxx`：源文档 §7 给图谱 77 条 flow 的编号（旁边 `flow:...` 是可在 `domain-graph.json` 精确搜索的 ID）；`①—⑧` 是该流按 `weight` 升序的步骤序号。
 - `U01`~`U10`：已闭合的归属决议编号（§5.1）；`T01`~`T04`：技术承载标签（§5.3），**不是业务域**。
+
+---
+
+## 5. 相关产物：领域术语表 PPT
+
+`ppt/` 目录把《体检系统升级V2 · 领域术语表》(`CONTEXT.md`) 转成评审用演示文稿：
+
+| 文件 | 说明 |
+|---|---|
+| `ppt/slides/体检系统升级V2-领域术语与切流架构.pptx` | 23 页 16:9，含每页演讲者备注 |
+| `ppt/slides/index.html` | 网页速览版（← → 翻页，可打印成 PDF） |
+| `ppt/deck_content.py` | 内容模型（术语文案 + 版面规范），改内容只改这里 |
+| `ppt/build.py` | 构建入口 + 版面自检（文字溢出 / 形状越界） |
+
+```bash
+python3 -m venv /tmp/venv-pptx && /tmp/venv-pptx/bin/pip install python-pptx
+/tmp/venv-pptx/bin/python ppt/build.py
+```
+
+字体与本目录的画图约定一致：统一 `Microsoft YaHei`，只用 `· ● ▪ □ ■ × → ← ↔ ①②③` 等覆盖良好的符号。
+详见 [`ppt/README.md`](ppt/README.md)。

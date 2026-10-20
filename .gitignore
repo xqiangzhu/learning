@@ -1,0 +1,6 @@
+# Python 缓存
+__pycache__/
+*.py[cod]
+
+# 大文件不入库（见 README.md §3：plantuml.jar 约 30MB，首次使用自行下载）
+tools/plantuml.jar
