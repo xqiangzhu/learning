@@ -153,8 +153,8 @@ def panel(slide, x, y, w, h, fill=PAPER):
 def page_no(slide, n):
     tbox(slide, 12.35, 7.08, 0.85, 0.3, f"{n:02d}", size=9, color=GRAY, align=PP_ALIGN.RIGHT)
 
-def header(slide, num, title, en, accent, tags):
-    box(slide, 0.55, 0.36, 0.68, 0.68, num, fill=accent, line=None, size=19, bold=True,
+def header(slide, num, title, en, accent, tags, badge_size=19):
+    box(slide, 0.55, 0.36, 0.68, 0.68, num, fill=accent, line=None, size=badge_size, bold=True,
         color=WHITE, radius=0.22)
     tbox(slide, 1.42, 0.28, 8.6, 0.55, title, size=23, bold=True, color=INK)
     tbox(slide, 1.44, 0.86, 8.6, 0.3, en, size=10.5, color=GRAY)
@@ -189,7 +189,7 @@ box(s, 9.6, -1.6, 5.2, 5.2, "", fill=DARK_2, line=None, shape=MSO_SHAPE.OVAL)
 box(s, -1.3, 5.2, 3.8, 3.8, "", fill=DARK_2, line=None, shape=MSO_SHAPE.OVAL)
 tbox(s, 0.75, 0.6, 8.0, 0.35, "HMSC · 企业健康体检平台", size=13, bold=True, color=RGBColor(0x8F, 0xB4, 0xE3))
 tbox(s, 0.75, 1.75, 12.0, 1.05, "体检平台架构决策与核心流程", size=38, bold=True, color=WHITE)
-tbox(s, 0.78, 2.85, 12.0, 0.45, "11 项关键机制决策 × 端到端流程全景（ADR 0001 – 0011）",
+tbox(s, 0.78, 2.85, 12.0, 0.45, "统一语言词表 × 11 项关键机制决策 × 端到端流程全景",
      size=15, color=RGBColor(0x9F, 0xC3, 0xE8))
 seg(s, 0.8, 3.55, 6.2, 3.55, color=TEAL, w=2.5)
 # 价值链小流程
@@ -203,6 +203,337 @@ for i, t in enumerate(cover_steps):
               color=RGBColor(0x5F, 0x7F, 0xA6), w=1.4)
     cx += cw + gap
 tbox(s, 0.78, 6.75, 9.0, 0.3, "需求评审版 · 2026-10", size=10.5, color=RGBColor(0x7C, 0x93, 0xB8))
+
+# =========================================================
+# 统一语言 · 术语表（共 59 词条，7 组）
+# =========================================================
+def term_card(slide, x, y, w, h, cn, en, definition, avoid, accent, compact=False):
+    box(slide, x, y, w, h, "", fill=WHITE, line=RGBColor(0xD8, 0xE0, 0xEC), lw=0.9, radius=0.055)
+    box(slide, x, y, 0.075, h, "", fill=accent, line=None, shape=MSO_SHAPE.RECTANGLE)
+    tsize = 10 if compact else 11.5
+    esize = 8 if compact else 9
+    dsize = 8 if compact else 9
+    asize = 7.5 if compact else 8.5
+    tb = slide.shapes.add_textbox(Inches(x + 0.17), Inches(y), Inches(w - 0.3), Inches(h))
+    tf = tb.text_frame
+    tf.word_wrap = True
+    tf.vertical_anchor = MSO_ANCHOR.MIDDLE
+    tf.margin_left = tf.margin_right = Inches(0.02)
+    tf.margin_top = tf.margin_bottom = Inches(0.03)
+    lines = [
+        [(cn + "  ", tsize, True, INK), (en, esize, False, GRAY)],
+        (definition, dsize, False, RGBColor(0x33, 0x3E, 0x52)),
+        [("避免叫法：", asize, True, RED), (avoid, asize, False, RED)],
+    ]
+    first = True
+    for ln in lines:
+        p = tf.paragraphs[0] if first else tf.add_paragraph()
+        first = False
+        p.alignment = PP_ALIGN.LEFT
+        p.line_spacing = 0.98
+        if isinstance(ln, tuple):
+            ln = [ln]
+        for t, sz, bd, col in ln:
+            r = p.add_run(); r.text = t
+            _style_run(r, sz, bd, col)
+    return tb
+
+def grid_cards(slide, terms, accent, compact, y0, yh, cols=3, x0=0.55, xw=12.23, gap=0.14):
+    cw = (xw - gap * (cols - 1)) / cols
+    for i, (cn, en, df, av) in enumerate(terms):
+        r_, c_ = divmod(i, cols)
+        term_card(slide, x0 + c_ * (cw + gap), y0 + r_ * (yh + gap), cw, yh,
+                  cn, en, df, av, accent, compact)
+
+def glossary_slide(label, title, en, accent, desc, terms):
+    s = new_slide()
+    header(s, label, title, en, accent, ["统一语言", f"{len(terms)} 词条"], badge_size=13)
+    decision_bar(s, desc, accent)
+    rows = (len(terms) + 2) // 3
+    compact = rows >= 3
+    y0 = 2.32 if rows >= 3 else (2.42 if rows == 2 else 2.72)
+    yh = 1.22 if rows >= 3 else (1.72 if rows == 2 else 2.05)
+    grid_cards(s, terms, accent, compact, y0, yh)
+    tbox(s, 0.55, 7.05, 11.0, 0.28,
+         "词条格式：标准定义 ＋ 避免叫法 —— 评审、需求、代码命名与外部供应商沟通统一使用标准名词",
+         size=8.5, color=GRAY)
+    page_no(s, glossary_slide._n)
+    glossary_slide._n += 1
+    return s
+
+# ---- G0 总览 ----
+s = new_slide()
+header(s, "词", "建立统一语言 · 体检业务核心域名词表", "Ubiquitous Language · 59 Terms in 7 Groups",
+       BLUE, ["统一语言", "59 词条", "7 组"], badge_size=15)
+decision_bar(s, "体检业务核心域：负责体检权益与预约履约全生命周期管理 —— 权益发放与购买 → 分院预约排期 → 到检核销 → 报告交付 → 健康解读增值服务。",
+             BLUE)
+gcat = [
+    ("权益与交易", "Entitlements", "6 词条", "Order · SubOrder · Holder · Refund", BLUE),
+    ("机构、门店与履约", "Supplier, Store & Fulfillment", "15 词条 · 2 页", "Appointment · Same-Store Reschedule · Bundled", TEAL),
+    ("报告与解读", "Reporting & VAS", "13 词条 · 2 页", "Report · LLM-OCR · AI / 医生解读", ORANGE),
+    ("购物车与合并结算", "Cart & Checkout", "3 词条", "Combination Order · Capacity Hold", GREEN),
+    ("积分与福利结算", "Points & Welfare", "8 词条", "Point Parity · Shadow Ledger · Callback Refund", GOLD),
+    ("套餐与项目模型", "Packages & Items", "9 词条", "Single-Core Invariant · Demographic Guard", PURPLE),
+    ("健康商城与卡券", "Shop & Vouchers", "5 词条", "Card Voucher Redemption · Non-Refundable", TEAL),
+]
+xs4 = [0.55, 3.64, 6.73, 9.82]
+ys2 = [2.42, 4.12]
+for i, (cn, en, cnt, sample, acc) in enumerate(gcat):
+    x, y = xs4[i % 4], ys2[i // 4]
+    box(s, x, y, 2.91, 1.5, "", fill=WHITE, line=RGBColor(0xD8, 0xE0, 0xEC), lw=1.0, radius=0.08)
+    box(s, x, y, 2.91, 0.07, "", fill=acc, line=None, shape=MSO_SHAPE.RECTANGLE)
+    tbox(s, x + 0.16, y + 0.13, 2.65, 0.32, cn, size=11.5, bold=True, color=INK)
+    tbox(s, x + 0.17, y + 0.47, 2.65, 0.24, en, size=8, color=GRAY)
+    tbox(s, x + 0.17, y + 0.72, 2.65, 0.26, cnt, size=10, bold=True, color=acc)
+    tbox(s, x + 0.17, y + 1.0, 2.62, 0.44, sample, size=8, color=GRAY)
+x, y = xs4[3], ys2[1]
+box(s, x, y, 2.91, 1.5, "", fill=PAPER, line=RGBColor(0xD8, 0xE0, 0xEC), lw=1.0, radius=0.08)
+tbox(s, x + 0.16, y + 0.13, 2.65, 0.3, "✗ Avoid = 沟通禁用叫法", size=10.5, bold=True, color=RED)
+tbox(s, x + 0.17, y + 0.48, 2.62, 0.95,
+     "每词条 = 标准定义 + 避免叫法。防止「预约单≠订单」「退款≠取消预约」等混用歧义，评审与编码统一引用本词表。",
+     size=8.5, color=RGBColor(0x4A, 0x55, 0x6C))
+tbox(s, 0.55, 5.95, 12.2, 0.3, "配套阅读：P13 – P23 · 11 项架构决策流程图详解（词条与决策机制一一呼应）",
+     size=9.5, color=GRAY)
+# 主链路小流程
+steps = ["权益", "选购", "建单", "支付", "预约", "到检", "报告", "解读"]
+cx, cw2, step2 = 0.6, 1.58, 1.51
+for i, t in enumerate(steps):
+    box(s, cx, 6.45, cw2, 0.5, t, fill=[BLUE, PURPLE, TEAL, BLUE, TEAL, TEAL, ORANGE, PURPLE][i],
+        line=None, shape=MSO_SHAPE.CHEVRON, size=9.5, bold=True, color=WHITE)
+    cx += step2
+page_no(s, 2)
+
+# ---- G1 权益与交易 ----
+glossary_slide._n = 3
+s = glossary_slide("词1", "权益与交易", "Entitlements", BLUE,
+    "界定体检资格与资金交易的凭据体系：一笔主订单严格对应一位持有人，子订单承载费用归属与套餐性质。",
+    [
+    ("主订单", "Order",
+     "体检资格与支付结算的交易凭据：支付成功即持有待预约权益；取消预约后权益恢复可再约；到检/出报告后闭环。",
+     "预约单、挂号单、采购单"),
+    ("子订单", "SubOrder",
+     "主订单项下具体项目包实例，区分费用归属（统付/自费）与套餐性质（主套餐、加项、升级），随主单统一履约。",
+     "主订单、项目明细、订单项"),
+    ("加项包", "Add-on Package",
+     "主套餐外额外叠加的单项/组合项目，通常员工自选自费或积分兑换，履约时随主套餐打包提交分院。",
+     "升级包、附加服务、附加险"),
+    ("升级包", "Upgrade Package",
+     "将原有主套餐整体置换升舱为更高规格套餐的差价凭据。",
+     "加项包、换购"),
+    ("持有人", "Holder",
+     "实际享有并执行体检资格的自然人；业务严格约束一笔主订单仅对应一位持有人。",
+     "购买人、下单人、客户、用户"),
+    ("退款", "Refund",
+     "已支付主订单款项原路返还：可取消预约后独立发起，也可直接申请并由系统级联取消关联预约单。",
+     "取消预约、换单、废单"),
+    ])
+
+# ---- G2 机构、门店与预约 ----
+s = glossary_slide("词2", "机构、门店与预约", "Supplier, Store & Appointment", TEAL,
+    "区分供应商两类接入形态（API 直连 / 公立人工确认）与门店实体；预约单是依附主订单存在的履约凭据。",
+    [
+    ("线上直连供应商", "Online Supplier",
+     "美年、爱康、瑞慈、中科、嘉会等具备 API 直连的民营连锁；预约时实时排期锁单，直接预约成功。",
+     "线下供应商、合作商、第三方"),
+    ("线下医院供应商", "Offline Supplier",
+     "公立医院体检中心，每家为独立 Supplier；无实时排期接口，走「申请成功→确认预约」人工确认链路。",
+     "线上供应商、虚拟机构"),
+    ("体检分院 / 门店", "Store",
+     "供应商在具体地理位置设立的实体网点，具备地址、营业时间、停业状态与适用套餐包清单。",
+     "供应商、机构、医院"),
+    ("套餐门店交集匹配", "Intersection Matching",
+     "可履约门店必须严格满足主套餐 + 全部自选加项包的设备与服务能力交集；支持先选套餐或先选门店双向流程。",
+     "自由搭配、任意门店"),
+    ("停业展示策略", "Suspension Visibility",
+     "企业项目维度配置停业分院的展示规则：完全过滤隐藏，或保留展示但置灰提示暂停服务不可约。",
+     "门店下架、物理删除"),
+    ("预约单", "Appointment",
+     "持有人锁定供应商、分院与就检日期的履约凭据，依附主订单，包含主套餐与所有加项包。",
+     "订单、排期、挂号单"),
+    ])
+
+# ---- G3 履约规则与边界 ----
+s = glossary_slide("词3", "履约规则与边界", "Fulfillment Rules & Boundaries", GREEN,
+    "约定改期、取消、屏蔽日、特批与超期释放等履约边界：同店改期、当日禁退可改、主+加项合并原子交付。",
+    [
+    ("原分院同店改期", "Same-Store Reschedule",
+     "仅在原预约分院范围内变更日期/时段；原单编号不变、不建新单、不影响主订单，禁止跨店。",
+     "重新预约、换店改期"),
+    ("取消预约", "Cancel Appointment",
+     "释放机构已锁定档期，主订单恢复可再次预约；体检日当天默认禁止用户主动取消。",
+     "退单、退款、废单"),
+    ("项目屏蔽日", "Blackout Dates",
+     "MIS 在企业项目维度配置的排期阻断日（长假、封网日），员工端命中日期统一屏蔽不可选。",
+     "机构停业、排期约满"),
+    ("排期时间段", "Schedule Period",
+     "同一就检日内的预约时间窗（如 08:00-09:00）；项目开关控制，未启用降级为全天。",
+     "预约轮次、挂号时段"),
+    ("特批协调排期", "Coordination Mode",
+     "日期标记「需协调」时触发客服特批：生成「申请成功」预约单，线下人工对接医院加号加配额。",
+     "线上直连锁单、自动驳回"),
+    ("当日不对称改退", "Asymmetric Day-of Policy",
+     "体检当天禁止主动取消（保机构医疗备料），但允许原分院内改期至后续可用日期。",
+     "全面锁单、任意退约"),
+    ("超期未到检自动释放", "Overdue Cancellation",
+     "No-show 超体检日由定时任务自动取消预约单、释放占容，主订单恢复「待预约」。",
+     "权益作废、永久占用"),
+    ("合并原子履约", "Bundled Fulfillment",
+     "主套餐 + 全部加项包不可分割整体交付（线上单一外部单挂子项 / 线下单条 Excel），单店单次完成。",
+     "拆分预约、跨院分拆"),
+    ("权益到期拦截门禁", "Equity Expiry Guard",
+     "权益过期后现存预约单虽可取消，但无法再次选店发起新预约，锁死企业福利预算敞口。",
+     "宽限期补约、过期换店"),
+    ])
+
+# ---- G4 报告同步与档案 ----
+s = glossary_slide("词4", "报告同步与档案", "Reporting & Health Record", ORANGE,
+    "到检与报告的回传归档机制：双轨状态同步、大模型 OCR 统一结构化、外院报告隔离与家庭共查。",
+    [
+    ("体检报告", "Report",
+     "体检中心到检后出具的总检成果数据与原件文件，标志体检履约链路的终态闭环。",
+     "解读结果、结论单"),
+    ("异常指标", "Abnormal Findings",
+     "报告中超出参考值区间或专科医生提示阳性体征的具体指标项。",
+     "疾病、确诊、异常报告"),
+    ("双轨到检报告同步", "Dual-Track Ingestion",
+     "线上民营定时轮询拉取到检+PDF（原生 JSON 已弃用）；线下公立由 MIS 导入名单或核销上传。",
+     "全自动回调、纯手工维护"),
+    ("大模型OCR结构化解析", "LLM-OCR Ingestion",
+     "全域原版 PDF 统一经大模型 OCR 抽取检测值与异常指标，映射标准字典后归档健康档案 HMES。",
+     "人工录入、机构私有 JSON"),
+    ("自主外院报告隔离", "Past Report Isolation",
+     "用户自传外院历史报告仅个人端可查，不推送健康档案、不参与正式历年趋势比对。",
+     "混合档案、污染主档"),
+    ("家庭报告共用查看", "Family Report Aggregation",
+     "员工账号可直接查阅本人及出资家属的体检报告，界面切换持有人，不设跨账号强制授权。",
+     "强制账号隔离、家属独立鉴权"),
+    ])
+
+# ---- G5 解读增值服务 ----
+s = glossary_slide("词5", "解读增值服务", "Interpretation Value-Added Services", PURPLE,
+    "分层解读服务：免费普惠 AI 即时解读与异步三方医生解读并行；C24/C59 随权益导入而非商城零售。",
+    [
+    ("报告解读增值服务", "Report Interpretation",
+     "系统配置启用的三方机构增值解读：报告推送专业机构深度分析，异步回传结论供用户查阅。",
+     "AI问答、医生问诊"),
+    ("AI智能解读", "AI Interpretation",
+     "基于结构化指标由算法/大模型即时输出成因与生活建议，与人工咨询独立平行、互不干扰。",
+     "医生咨询、人工解读"),
+    ("医生咨询", "Doctor Consultation",
+     "用户就健康问题或指标向专业医生发起一对一图文/电话问诊，独立于 AI 解读存在。",
+     "报告解读、AI客服"),
+    ("异步三方医生解读流水线", "Async Physician Pipeline",
+     "工单制：报告+病史异步推送三方专科医生，限时核阅后结构化结论回调回写，挂载权益与报告项下。",
+     "实时通讯、电话直拨"),
+    ("权益子产品导入赋权", "Benefit-Imported Sub-Product",
+     "C24/C59 不在商城销售：随企业权益包作为子产品导入，出报告后核验权益开放解读入口。",
+     "商城零售单买、事后加购"),
+    ("项目级普惠AI解读", "Universal AI Interpretation",
+     "项目开关开启后，所有出报告员工均可即时、免费查阅指标成因与调理建议。",
+     "付费AI、专享AI"),
+    ("B端异常指标监控看板", "B2B Dashboard",
+     "面向企业 HR 的团队异常指标分布与健康监控看板，脱敏合规，服务雇主健康干预决策。",
+     "个人短信报警、粗暴推弹窗"),
+    ])
+
+# ---- G6 购物车与合并结算 ----
+s = glossary_slide("词6", "购物车与合并结算", "Cart & Aggregate Checkout", GREEN,
+    "购物车到收银台的瞬态结算链路：合单不占容、支付即解体、超时自动释放占容回退购物车。",
+    [
+    ("购物车项", "Cart Item",
+     "单个持有人意向体检的草稿容器：承载 1 位持有人 + 主套餐 + 加项包 + 意向门店日期；不占名额，超时回退，支付回调后物理清理。",
+     "购物车商品、预订单、挂单"),
+    ("组合订单", "Combination Order",
+     "多购物车项合并结算的瞬态聚合凭据：仅用于收银台合并扣减积分与调起支付网关；支付成功即解体为各自独立主订单，不承载售后。",
+     "合并订单、大订单、批量订单"),
+    ("排期临时占容", "Capacity Hold",
+     "下单时对意向分院时段的临时占座：15 分钟未支付由定时任务自动取消并释放；支付成功回调后正式扣减确立。",
+     "锁库存、排期占座、预约挂号"),
+    ])
+
+# ---- G7 积分与福利结算 ----
+s = glossary_slide("词7", "积分与福利结算", "Points & Welfare Settlement", GOLD,
+    "1:1 等值抵扣与两阶段结算：先升舱后加项、子订单分摊落标、双账本镜像防超扣与回调驱动退积分。",
+    [
+    ("积分等值比例", "Point Parity",
+     "积分与法定货币严格 1:1 等值（1 积分=1 元），忽略动态汇率配置，支持 100% 全额抵扣。",
+     "动态积分比例、浮动汇率"),
+    ("积分抵扣优先级", "Point Deduction Priority",
+     "混合结算的法定扣减顺序：先主套餐升级/加价，后自选加项包。",
+     "加项优先、随机抵扣、均摊抵扣"),
+    ("积分子订单分摊", "SubOrder Allocation",
+     "整单积分与现金按优先级精确写入对应子订单记账，支付结构透明可溯。",
+     "主单汇总记账、模糊分摊"),
+    ("权益附随积分", "Benefit-bound Points",
+     "额度与生命周期完全依附体检权益起止日期；总账由下游积分平台托管，HMSC 不设独立钱包。",
+     "平台代币、独立钱包、永久积分"),
+    ("回调驱动退积分", "Callback-driven Refund",
+     "资金退款异步成功回调驱动退还积分；下游失败回滚重试，超限流转人工介入。",
+     "同步退积分、资金前置返还"),
+    ("两阶段冻结转实扣", "Two-phase Settlement",
+     "正向「下单预冻结→支付回调实扣」；逆向「取消待付原路解冻→退款回调解冻」。",
+     "直接扣减、立即核销、单步扣款"),
+    ("双边镜像账本", "Shadow Ledger",
+     "外部平台冻结的同时在核心本地并发记录镜像预冻结流水：防超扣、双边留痕、端到端对账。",
+     "本地独立钱包、单边记账、虚账"),
+    ("明细级SKU穿透", "SKU-level Mapping",
+     "向外部平台提交扣减时将子订单精细映射为商品行项目（sku/数量/单价），拒绝订单级总额粗扣。",
+     "订单级总额抵扣、粗粒度扣减"),
+    ])
+
+# ---- G8 套餐与项目模型 ----
+s = glossary_slide("词8", "套餐与项目模型", "Packages, Items & Customization", PURPLE,
+    "套餐层级与医学规约：主干单选互斥、差额升舱、适检门禁、标准医学字典与家属积分共济。",
+    [
+    ("主干套餐单选互斥", "Single-Core Invariant",
+     "标准主套餐(00)/升级套餐(02)/加价套餐(03)必须且只能选其一作为履约基础。",
+     "多选主套餐、仅选加项包"),
+    ("升级换购补差价", "Upgrade Price Difference",
+     "升级套餐按「升级售价 − 统付基准价」差额算价；差价支持自费或积分 1:1 全额抵扣。",
+     "升级全额自费、独立双套餐"),
+    ("加价套餐", "Price-markup Package",
+     "原套餐项目不变、因分院溢价产生的附加价套餐(03)：编码与主套餐一致，补付 extraPrice。",
+     "升级套餐、加项包"),
+    ("加项包互斥与限额", "Exclusivity & Budget Cap",
+     "自选加项包(01)叠加约束：同类冲突项目医学互斥禁兼选，受企业金额/额度上限严格管控。",
+     "无限加选、冲突混选"),
+    ("适检人口属性门禁", "Demographic Guard",
+     "基于持有人性别与婚姻状态做前端展示过滤与下单硬拦截，杜绝禁忌项目开单。",
+     "通用体检包、人群免检"),
+    ("受益人范围划分", "Beneficiary Scope",
+     "员工专属产品包(P) 与家属产品包(G) 分区，对应不同统付额度、自费补贴与可约分院清单。",
+     "统一大包、混龄包"),
+    ("平台标准医学字典", "Standard Medical Taxonomy",
+     "平台统一维护科目与临床项目字典：各供应商异构项目入库统一映射对齐，保证跨机构可比。",
+     "供应商私有字典、随意录入"),
+    ("家属积分共济", "Family Points Sharing",
+     "家属包企业不统付：员工全额自费或纯积分购买，可直扣员工本人福利积分账户。",
+     "企业统付家属、独立家属积分"),
+    ("问卷推荐自动勾选", "Auto-Recommendation",
+     "基于生活习惯与家族病史问卷计算健康风险，推荐套餐与加项包并默认自动勾选。",
+     "纯文本建议、盲目自选"),
+    ])
+
+# ---- G9 健康商城与卡券 ----
+s = glossary_slide("词9", "健康商城与卡券", "Health Shop & Vouchers", TEAL,
+    "多租户商城与卡券风控：项目级自定义分类、卡密兑换生成核心权益、兑换后锁死不可退款。",
+    [
+    ("项目自定义分类", "Project Custom Categorization",
+     "按企业项目维度配置商品分类，双轨标签区分「优惠套餐购买/健康商城分类」，前端动态过滤，千企千面橱窗隔离。",
+     "平台硬编码分类、大一统类目"),
+    ("卡券卡密兑换", "Card Voucher Redemption",
+     "商城卡券在企业体检端经 checkGardPassword 核验，在下游核心域生成正式权益（Benefit）后进入标准履约流程。",
+     "跨域直生待预约单、绕过核心权益"),
+    ("优惠套餐即时转单", "Discount Package Order",
+     "自费优惠套餐支付成功直接生成待预约主订单（支持积分 1:1 抵扣），免卡券兑换环节，可立即选分院排期。",
+     "优惠卡密、延迟入账"),
+    ("卡密核销锁死边界", "Non-Refundable Boundary",
+     "未兑换期关闭前台自助退款，须客服 MIS 审核原路退；一旦兑换生成核心权益即永久锁死不可退。",
+     "自助秒退卡密、兑换后退卡"),
+    ("实物商品退款级序", "Physical Goods Refund",
+     "未发货可自主即时退款；发货后须退货退款闭环（寄回验收）；混合退款由资金回调驱动释放积分。",
+     "发货后直接退款、同步退积分"),
+    ])
 
 # =========================================================
 # S1 全景导航
@@ -253,7 +584,7 @@ for i, t in enumerate(steps):
     box(s, cx, 6.62, cw, 0.56, t, fill=BLUE if i < 7 else PURPLE, line=None,
         shape=MSO_SHAPE.CHEVRON, size=10, bold=True, color=WHITE)
     cx += step
-page_no(s, 2)
+page_no(s, 12)
 
 # =========================================================
 # 通用内容页构建器
@@ -290,7 +621,7 @@ box(s, 0.6, 4.32, 5.75, 0.85, [("反例：若 1 单多持有人", 10, True, RED)
     fill=RED_L, line=RED, size=9.5, dash=True)
 tbox(s, 6.85, 5.35, 4.95, 0.4, "多人员体检（家庭套餐 / 批量购买）在下单时直接拆单", size=9.5, color=GRAY)
 tbox(s, 0.6, 5.35, 5.75, 0.4, "数据库 MEMBER_EWP_ORDER_HOLDER 物理可 1:N —— 业务上锁死 1:1", size=9.5, color=GRAY)
-page_no(s, 3)
+page_no(s, 13)
 
 # =========================================================
 # S3 决策02 双轨取消退款
@@ -321,7 +652,7 @@ arrow(s, 9.17, 4.98, 9.48, 4.98); arrow(s, 11.37, 4.98, 11.58, 4.98)
 seg(s, 5.55, 5.52, 5.55, 5.95); arrow(s, 5.55, 5.95, 10.42, 5.95)
 seg(s, 10.42, 5.95, 10.42, 5.42)
 tbox(s, 5.72, 5.6, 1.6, 0.3, "是 · 已取消", size=8.5, bold=True, color=ARROW)
-page_no(s, 4)
+page_no(s, 14)
 
 # =========================================================
 # S4 决策03 组合订单瞬态
@@ -350,7 +681,7 @@ arrow(s, 3.22, 5.0, 3.53, 5.0); arrow(s, 5.77, 5.0, 6.08, 5.0)
 box(s, 8.75, 4.62, 4.03, 0.75, [("用户端「我的订单」/ 后台管理", 9.5, True, INK),
     ("仅呈现解体后的 N 笔主订单，各显各人、各持预约单", 9, False, INK)],
     fill=PAPER, line=None, size=9.5)
-page_no(s, 5)
+page_no(s, 15)
 
 # =========================================================
 # S5 决策04 积分抵扣与子订单分摊
@@ -381,7 +712,7 @@ tbox(s, 5.85, 3.98, 1.5, 0.24, "scoreValue 分摊写入", size=8, bold=True, col
 box(s, 7.3, 5.24, 5.45, 0.66, "财务分账 · 发票拆分 · 售后退款 —— 每笔构成原子级可溯",
     fill=GREEN_L, line=GREEN, size=10, bold=True)
 arrow(s, 10.02, 4.82, 10.02, 5.22)
-page_no(s, 6)
+page_no(s, 16)
 
 # =========================================================
 # S6 决策05 回调驱动退积分
@@ -412,7 +743,7 @@ box(s, 10.95, 2.35, 1.83, 3.35, [
     ("③ 正向：预冻结 → 回调转实扣", 8.5, False, INK),
     ("④ 逆向：待付取消原路释放", 8.5, False, INK)],
     fill=PAPER, line=None, size=9, align=PP_ALIGN.LEFT)
-page_no(s, 7)
+page_no(s, 17)
 
 # =========================================================
 # S7 决策06 双账本镜像对账
@@ -450,7 +781,7 @@ tbox(s, 9.45, 4.93, 1.1, 0.2, "仍未撤销", size=8, bold=True, color=ARROW)
 seg(s, 6.85, 5.4, 6.85, 5.92); seg(s, 6.85, 5.92, 11.82, 5.92)
 arrow(s, 11.82, 5.92, 11.82, 5.04)
 tbox(s, 7.0, 5.94, 0.8, 0.26, "是", size=8.5, bold=True, color=ARROW)
-page_no(s, 8)
+page_no(s, 18)
 
 # =========================================================
 # S8 决策07 排期容量与改期边界
@@ -491,7 +822,7 @@ d3 = box(s, 6.65, 5.32, 1.85, 0.6, "No-show 超体检日", fill=WHITE, line=RED,
 d4 = box(s, 8.85, 5.28, 2.75, 0.68, "定时任务自动取消\n释放占容 · 主单恢复待预约", fill=GREEN_L, line=GREEN, size=8.5)
 arrow(s, 8.52, 4.78, 8.83, 4.82); arrow(s, 8.52, 5.62, 8.83, 5.62)
 tbox(s, 11.25, 4.55, 1.5, 0.9, "权益有效期内\n可重新履约", size=8.5, color=GRAY)
-page_no(s, 9)
+page_no(s, 19)
 
 # =========================================================
 # S9 决策08 合并履约 / 权益门禁 / 双轨同步
@@ -528,7 +859,7 @@ w3 = box(s, 11.51, 4.3, 1.19, 0.52, "05 已出报告", fill=PAPER, line=LINE, si
 arrow(s, 9.93, 4.56, 10.11, 4.56); arrow(s, 11.31, 4.56, 11.49, 4.56)
 s4 = box(s, 8.75, 5.05, 3.95, 0.7, "线下公立 · MIS 运营导入\nExcel 名单 / 核销上传扫描件 → 人工推进同一状态机", fill=WHITE, line=ORANGE, size=8.5)
 arrow(s, 10.72, 4.09, 10.72, 3.95, dash=True)
-page_no(s, 10)
+page_no(s, 20)
 
 # =========================================================
 # S10 决策09 套餐模型与智能推荐
@@ -564,7 +895,7 @@ q2 = box(s, 8.27, 5.22, 1.4, 0.85, "风险模型\n动态计算\n健康风险", f
 q3 = box(s, 9.84, 5.22, 1.4, 0.85, "匹配推荐\n主套餐\n+ 加项包", fill=WHITE, line=PURPLE, size=8.5)
 q4 = box(s, 11.41, 5.22, 1.37, 0.85, "界面默认\n自动勾选 ✓", fill=GREEN_L, line=GREEN, size=8.5, bold=True)
 arrow(s, 8.12, 5.64, 8.25, 5.64); arrow(s, 9.69, 5.64, 9.82, 5.64); arrow(s, 11.26, 5.64, 11.39, 5.64)
-page_no(s, 11)
+page_no(s, 21)
 
 # =========================================================
 # S11 决策10 报告解读增值流水线
@@ -590,7 +921,7 @@ u2 = box(s, 6.85, 4.72, 5.93, 0.9, "结构化数据+病史 → 推送三方解�
 n1 = box(s, 0.6, 5.82, 4.75, 0.55, "C24/C59 非商城零售 · 随企业权益子产品导入赋权", fill=GOLD_L, line=GOLD, size=8.5)
 n2 = box(s, 5.55, 5.82, 3.4, 0.55, "B 端 HR 异常指标看板 · 脱敏合规授权", fill=PAPER, line=LINE, size=8.5)
 n3 = box(s, 9.15, 5.82, 3.63, 0.55, "家庭报告归集员工账户 · 切换持有人查看", fill=PAPER, line=LINE, size=8.5)
-page_no(s, 12)
+page_no(s, 22)
 
 # =========================================================
 # S12 决策11 商城分类与卡券兑换
@@ -622,7 +953,7 @@ xb = box(s, 0.6, 5.62, 9.15, 0.55, "边界红线：C24/C59 医疗增值服务不
 tag(s, 10.15, 4.45, "卡券退款守卫", RED, size=10)
 y1 = box(s, 10.15, 4.8, 2.63, 0.58, "未兑换：关闭自助退款\n客服介入 · MIS 核实原路退", fill=WHITE, line=GOLD, size=8)
 y2 = box(s, 10.15, 5.5, 2.63, 0.58, "已兑换生成权益\n永久锁死 · 不可退款 ✗", fill=RED_L, line=RED, size=8)
-page_no(s, 13)
+page_no(s, 23)
 
 # =========================================================
 # S13 端到端总流程
@@ -663,7 +994,7 @@ for t in ["1 积分 = 1 元等值", "子订单分摊落标", "双账本镜像对
 box(s, 0.6, 6.15, 12.18, 0.85, [("主线契约：", 10.5, True, INK),
     ("商城/卡券/企业导入统一沉淀为「权益（Benefit）」→ 履约以「主订单 1:1 持有人」为基石 → 资金以「回调驱动 + 镜像对账」保一致 → 数据以「LLM OCR + 标准字典」大一统归档。", 10.5, False, INK)],
     fill=PAPER, line=None, align=PP_ALIGN.LEFT)
-page_no(s, 14)
+page_no(s, 24)
 
 # =========================================================
 # S14 收尾 · 效果与影响
@@ -690,7 +1021,7 @@ for (title, acc, items), x in zip(cols, xs):
         ly += 0.92
 box(s, 1.4, 5.75, 10.53, 0.85, "以「权益」为中心 · 以「主订单 1:1 持有人」为基石 · 以「回调驱动 + 镜像对账」保一致\n支撑企业健康福利的规模化、可审计、可追溯履约",
     fill=TEAL_L, line=TEAL, size=13, bold=True, color=RGBColor(0x0A, 0x5C, 0x64))
-page_no(s, 15)
+page_no(s, 25)
 
 # ---------------- save ----------------
 prs.core_properties.title = "体检平台架构决策与核心流程"
