@@ -1023,6 +1023,73 @@ box(s, 1.4, 5.75, 10.53, 0.85, "以「权益」为中心 · 以「主订单 1:1 
     fill=TEAL_L, line=TEAL, size=13, bold=True, color=RGBColor(0x0A, 0x5C, 0x64))
 page_no(s, 25)
 
+# =========================================================
+# S26 架构决策的自动化测试 · 域边界与回归
+# =========================================================
+s = new_slide()
+header(s, "TEST", "架构决策可测试化 · 域边界测试与回归", "Executable ADRs · Domain Boundary & Regression Tests",
+       GREEN, ["域边界", "回归护栏", "24 用例"], badge_size=11)
+decision_bar(s, "架构决策不止于文档：各项 ADR 的业务规则固化为可执行测试用例（node --test），以域为边界持续验证 —— 正例允许、反例强制拦截，变更一键回归，减少人工评审与巡检。",
+             GREEN)
+# 顶部流程
+flow = [("ADR-0001~0011\n架构决策文档", BLUE_L, BLUE),
+        ("抽取可执行规则\n正例 + 反例断言", WHITE, BLUE),
+        ("tests/adr_rules.test.mjs\n域边界测试用例", WHITE, BLUE),
+        ("node --test\n自动执行", DARK, None),
+        ("24 / 24 全部通过", GREEN, None)]
+fx, fw, fgap = 0.6, 2.28, 0.22
+for i, (t, fl, ln) in enumerate(flow):
+    x = fx + i * (fw + fgap)
+    box(s, x, 2.22, fw, 0.78, t, fill=fl, line=ln, size=9.5, bold=(i >= 3),
+        color=WHITE if i == 3 else INK)
+    if i < len(flow) - 1:
+        arrow(s, x + fw + 0.01, 2.61, x + fw + fgap - 0.01, 2.61)
+# 左侧：用例分组
+panel(s, 0.55, 3.24, 6.7, 3.52)
+tag(s, 0.7, 3.32, "用例分组与代表性断言（ADR-0001 ~ 0009 · 24 条）", GREEN, size=10.5)
+cases = [
+    ("0001", "单笔订单仅绑定单一持有人", "1 单 1 人强约束 · 拆单独立闭环", "2/2"),
+    ("0002", "预约取消与退款双轨联动", "级联取消预约 · 双路径状态收敛", "2/2"),
+    ("0003", "组合订单支付瞬态包装器", "合单收银 · 支付后解体 · 超时回退", "4/4"),
+    ("0004", "积分抵扣与子订单分摊", "1:1 先升舱后加项 · 分摊计算错误拦截", "2/2"),
+    ("0005", "回调驱动退积分", "回调成功才释放 · 提前释放判为严重缺陷", "2/2"),
+    ("0006", "双账本镜像并发双冻结", "双冻结+SKU 1:1 穿透 · 镜像失败阻断超扣", "2/2"),
+    ("0007", "排期改期边界与超期释放", "同店改期允许 · 跨店强制阻断 · 当天禁退可改", "4/4"),
+    ("0008", "合并履约与权益到期门禁", "主+加项原子交付 · 过期禁止发起新预约", "2/2"),
+    ("0009", "套餐层级与问卷推荐规约", "单选互斥多选拦截 · 适检门禁 · 家属包不统付", "4/4"),
+]
+ry = 3.68
+for num, name, assertion, cnt in cases:
+    box(s, 0.7, ry, 0.78, 0.28, "ADR-" + num, fill=TEAL_L, line=None, size=8, bold=True,
+        color=TEAL, radius=0.5)
+    tbox(s, 1.56, ry - 0.015, 2.42, 0.3, name, size=8.5, bold=True, color=INK)
+    tbox(s, 4.0, ry - 0.015, 2.6, 0.3, assertion, size=8, color=RGBColor(0x4A, 0x55, 0x6C))
+    tbox(s, 6.72, ry - 0.015, 0.45, 0.3, cnt, size=8.5, bold=True, color=GREEN, align=PP_ALIGN.RIGHT)
+    ry += 0.335
+# 右侧：三大价值
+vx, vw = 7.45, 5.33
+v1 = box(s, vx, 3.24, vw, 1.06, "", fill=WHITE, line=TEAL, lw=1.1, radius=0.07)
+tbox(s, vx + 0.18, 3.36, vw - 0.3, 0.28, "① 域边界测试 · 正例允许 / 反例拦截", size=10.5, bold=True, color=TEAL)
+tbox(s, vx + 0.18, 3.66, vw - 0.36, 0.6,
+     "每条决策同时验证「应该发生」与「必须被拒绝」：跨店改期阻断、多选主干套餐拦截、\n适检门禁硬校验、资金未确认提前退积分判为严重缺陷。",
+     size=8.5, color=RGBColor(0x4A, 0x55, 0x6C))
+v2 = box(s, vx, 4.44, vw, 1.06, "", fill=WHITE, line=BLUE, lw=1.1, radius=0.07)
+tbox(s, vx + 0.18, 4.56, vw - 0.3, 0.28, "② 回归测试 · 决策规则即护栏", size=10.5, bold=True, color=BLUE)
+tbox(s, vx + 0.18, 4.86, vw - 0.36, 0.6,
+     "规则即用例：任何需求变更 / 重构后一键重跑全量用例，防止新代码破坏既有架构约束，\n替代人工全链路巡检与口头约定。",
+     size=8.5, color=RGBColor(0x4A, 0x55, 0x6C))
+v3 = box(s, vx, 5.64, vw, 1.06, "", fill=WHITE, line=GREEN, lw=1.1, radius=0.07)
+tbox(s, vx + 0.18, 5.76, vw - 0.3, 0.28, "③ 减少人工 · 用例即活文档", size=10.5, bold=True, color=GREEN)
+tbox(s, vx + 0.18, 6.06, vw - 0.36, 0.6,
+     "测试断言即规格口径：评审聚焦新决策与例外场景，规则分歧以断言为准；\n0010/0011（报告解读 · 商城卡券）可按同一模式持续扩展。",
+     size=8.5, color=RGBColor(0x4A, 0x55, 0x6C))
+# 底部命令条
+box(s, 0.55, 6.94, 8.2, 0.42, "运行命令：  node --test tests/adr_rules.test.mjs",
+    fill=DARK, line=None, size=10.5, bold=True, color=RGBColor(0x9F, 0xE8, 0xB0))
+box(s, 8.9, 6.94, 3.88, 0.42, "24/24 Passed · 全域边界校验通过",
+    fill=GREEN_L, line=GREEN, size=10, bold=True, color=RGBColor(0x1D, 0x6B, 0x3C))
+page_no(s, 26)
+
 # ---------------- save ----------------
 prs.core_properties.title = "体检平台架构决策与核心流程"
 prs.core_properties.author = "HMSC 架构组"
