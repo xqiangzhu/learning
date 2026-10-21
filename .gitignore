@@ -4,3 +4,7 @@ __pycache__/
 
 # 大文件不入库（见 README.md §3：plantuml.jar 约 30MB，首次使用自行下载）
 tools/plantuml.jar
+
+# 本地虚拟环境
+.venv/
+venv/

@@ -71,19 +71,23 @@ java -jar tools/plantuml.jar -charset UTF-8 -o ./preview ORD-订单域-业务流
 
 ## 5. 相关产物：领域术语表 PPT
 
-`ppt/` 目录把《体检系统升级V2 · 领域术语表》(`CONTEXT.md`) 转成评审用演示文稿：
+`ppt/` 目录把《体检系统升级V2 · 领域术语表》(`CONTEXT.md`) 转成评审用演示文稿，
+**10 页精简版为主交付物**，23 页完整版留作附录：
 
 | 文件 | 说明 |
 |---|---|
-| `ppt/slides/体检系统升级V2-领域术语与切流架构.pptx` | 23 页 16:9，含每页演讲者备注 |
-| `ppt/slides/index.html` | 网页速览版（← → 翻页，可打印成 PDF） |
+| `ppt/slides/体检系统升级V2-术语与切流架构-10页.pptx` | **10 页 16:9 精简版**，含每页演讲者备注 |
+| `ppt/slides/体检系统升级V2-术语与切流架构-23页完整版.pptx` | 23 页完整版（导读/章节页/速查表 ×2/ADR 索引） |
+| `ppt/slides/index.html` `ppt/slides/full.html` | 两版的网页速览（← → 翻页，可打印成 PDF） |
 | `ppt/deck_content.py` | 内容模型（术语文案 + 版面规范），改内容只改这里 |
-| `ppt/build.py` | 构建入口 + 版面自检（文字溢出 / 形状越界） |
+| `ppt/build.py` | 构建入口 + 版面自检（文字溢出 / 形状越界，两版均 0 问题） |
 
 ```bash
-python3 -m venv /tmp/venv-pptx && /tmp/venv-pptx/bin/pip install python-pptx
-/tmp/venv-pptx/bin/python ppt/build.py
+python3 -m venv .venv && .venv/bin/pip install python-pptx
+.venv/bin/python ppt/build.py                 # 两个版本 + 两份网页速览
+.venv/bin/python ppt/build.py --only compact  # 只构建 10 页精简版
 ```
 
-字体与本目录的画图约定一致：统一 `Microsoft YaHei`，只用 `· ● ▪ □ ■ × → ← ↔ ①②③` 等覆盖良好的符号。
-详见 [`ppt/README.md`](ppt/README.md)。
+10 页版不复制文案：它由 23 页版程序化派生（合并页把被挤掉的内容降级为强调条/页脚注），
+14 个术语一个不少。字体与本目录的画图约定一致：统一 `Microsoft YaHei`，只用
+`· ● ▪ □ ■ × → ← ↔ ①②③` 等覆盖良好的符号。详见 [`ppt/README.md`](ppt/README.md)。

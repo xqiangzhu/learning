@@ -364,10 +364,12 @@ def r_table(spec, page, total):
                 tds.append('<td>%s</td>' % esc(val))
         body.append('<tr class="%s" style="height:%dpx">%s</tr>'
                     % ("even" if i % 2 == 0 else "odd", IN(row_h), "".join(tds)))
-    tbl = ('<table class="tbl%s" style="top:%dpx;left:%dpx;width:%dpx">%s'
+    fsz = (';--bs:%.1fpx;--hs:%.1fpx' % (PT(spec["bs"]), PT(spec["hs"]))
+           if spec.get("bs") or spec.get("hs") else '')
+    tbl = ('<table class="tbl%s" style="top:%dpx;left:%dpx;width:%dpx%s">%s'
            '<thead><tr style="height:%dpx">%s</tr></thead>'
            '<tbody>%s</tbody></table>'
-           % (" compact" if compact else "", IN(ty), IN(ML), IN(CW),
+           % (" compact" if compact else "", IN(ty), IN(ML), IN(CW), fsz,
               "<colgroup>%s</colgroup>" % cols, IN(head_h), thead, "".join(body)))
     return ('<div class="slide">' + h_header(spec) + tbl + h_footnote(spec) +
             h_footer(page, total) + '</div>')
@@ -530,6 +532,7 @@ body{background:#22303f;font-family:"Microsoft YaHei","PingFang SC","Hiragino Sa
 .bar .sub{font-size:11.5px;color:#9FB4C9}
 .bar a{font-size:12px;color:#0E2038;background:#12A5B8;padding:6px 12px;border-radius:14px;
  text-decoration:none;font-weight:700}
+.bar a.ghost{background:#17324F;color:#9FB4C9;border:1px solid #24486e}
 .bar .nav{margin-left:auto;display:flex;gap:4px;flex-wrap:wrap;max-width:52%}
 .bar .nav button{background:#17324F;color:#9FB4C9;border:1px solid #24486e;font-size:11px;
  width:26px;height:22px;border-radius:4px;cursor:pointer;font-family:inherit}
@@ -621,11 +624,11 @@ body{background:#22303f;font-family:"Microsoft YaHei","PingFang SC","Hiragino Sa
 .tlbody.c{text-align:center;font-size:15.3px}
 /* 表格 */
 .tbl{border-collapse:collapse;left:69px}
-.tbl th{background:#0E2038;color:#fff;font-size:14.6px;font-weight:700;text-align:left;
+.tbl th{background:#0E2038;color:#fff;font-size:var(--hs,14.6px);font-weight:700;text-align:left;
  padding:6px 10px;border:1px solid #0E2038}
-.tbl td{font-size:14.6px;color:#1B2733;padding:6px 10px;border:1px solid #DCE3EC;
+.tbl td{font-size:var(--bs,14.6px);color:#1B2733;padding:6px 10px;border:1px solid #DCE3EC;
  line-height:1.3;vertical-align:middle}
-.tbl.compact th{font-size:13.3px}.tbl.compact td{font-size:12.6px}
+.tbl.compact{--hs:13.3px;--bs:12.6px}
 .tbl tr.even td{background:#fff}.tbl tr.odd td{background:#F2F6FA}
 .tbl td.c0{font-weight:700}
 .tbl td.tag{font-weight:700;font-size:12px}
@@ -717,11 +720,14 @@ JS = """
 """
 
 
-def build(out_path, pptx_name=None):
-    total = len(SLIDES)
+def build(out_path, pptx_name=None, slides=None, meta=None, extra_links=""):
+    """slides: 指定要渲染的幻灯片列表（默认 deck_content.SLIDES）。"""
+    slides = SLIDES if slides is None else slides
+    meta = META if meta is None else meta
+    total = len(slides)
     parts = []
     navs = []
-    for i, spec in enumerate(SLIDES, 1):
+    for i, spec in enumerate(slides, 1):
         inner = RENDERERS[spec["kind"]](spec, i, total)
         parts.append('<div class="slot" id="s%d">%s</div>' % (i, inner))
         navs.append('<button title="%s">%02d</button>'
@@ -732,11 +738,11 @@ def build(out_path, pptx_name=None):
            "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">"
            "<title>%s · 网页速览版</title><style>%s</style></head><body>"
            "<div class=\"bar\"><h1>%s</h1><span class=\"sub\">网页速览版 · %d 页 · "
-           "← → 翻页 · 可打印为 PDF</span>%s"
+           "← → 翻页 · 可打印为 PDF</span>%s%s"
            "<div class=\"nav\">%s</div></div>%s"
            "<p class=\"tip\">最终以 .pptx 为准：网页版仅用于快速校对内容与版面。</p>"
            "<script>%s</script></body></html>"
-           % (esc(META["title"]), CSS, esc(META["title"]), total, dl,
+           % (esc(meta["title"]), CSS, esc(meta["title"]), total, dl, extra_links,
               "".join(navs), "".join(parts), JS))
     with open(out_path, "w", encoding="utf-8") as f:
         f.write(doc)

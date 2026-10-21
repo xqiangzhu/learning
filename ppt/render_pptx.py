@@ -680,8 +680,8 @@ def r_table(prs, spec, page, total):
     row_h = min(0.60 if not compact else 0.60, (avail - head_h) / n)
     th = head_h + row_h * n
     ty = top + max(0.0, (avail - th) / 2)
-    hs = 10 if compact else 11
-    bs = 9.5 if compact else 11
+    hs = spec.get("hs", 10 if compact else 11)
+    bs = spec.get("bs", 9.5 if compact else 11)
     gf = s.shapes.add_table(n + 1, len(heads), Inches(ML), Inches(ty), Inches(CW),
                             Inches(th))
     tbl = gf.table
@@ -947,21 +947,24 @@ RENDERERS = {
 }
 
 
-def build(out_path):
+def build(out_path, slides=None, meta=None):
+    """slides: 指定要渲染的幻灯片列表（默认 deck_content.SLIDES）。"""
+    slides = SLIDES if slides is None else slides
+    meta = META if meta is None else meta
     prs = Presentation()
     prs.slide_width, prs.slide_height = Inches(SW), Inches(SH)
-    total = len(SLIDES)
-    for i, spec in enumerate(SLIDES, 1):
+    total = len(slides)
+    for i, spec in enumerate(slides, 1):
         kind = spec["kind"]
         if kind not in RENDERERS:
             raise ValueError("未实现的版式：%s" % kind)
         slide = RENDERERS[kind](prs, spec, i, total)
         add_notes(slide, spec)
     cp = prs.core_properties
-    cp.title = META["title"]
-    cp.author = META["author"]
-    cp.subject = META["subject"]
-    cp.comments = META["comments"]
+    cp.title = meta["title"]
+    cp.author = meta["author"]
+    cp.subject = meta["subject"]
+    cp.comments = meta["comments"]
     cp.category = "架构评审 / 领域术语"
     cp.keywords = "蓝绿双站;原子切流;Expand and Contract;区域亲和路由;体检系统升级V2"
     prs.save(out_path)
