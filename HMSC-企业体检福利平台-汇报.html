@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>企业体检福利平台（HMSC）· 系统汇报</title>
+<style>
+:root{
+  --navy:#0B2C4A; --navy2:#0E3A61; --teal:#0E9A8B; --teal2:#12B5A5;
+  --gold:#E8A838; --bg:#F4F6F9; --card:#fff; --line:#E2E8F0; --text:#1E293B;
+  --muted:#64748B; --muted2:#94A3B8; --red:#DC2626; --amber:#D97706;
+  --radius:16px; --shadow:0 10px 30px rgba(11,44,74,.08);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:"PingFang SC","Microsoft YaHei","Noto Sans SC",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--text);line-height:1.7}
+a{color:var(--teal);text-decoration:none}
+a:hover{text-decoration:underline}
+/* progress */
+#progress{position:fixed;top:0;left:0;height:4px;background:linear-gradient(90deg,var(--teal),var(--gold));width:0;z-index:999;transition:width .1s}
+/* hero */
+.hero{background:linear-gradient(135deg,#081E36 0%,#0B2C4A 45%,#0E4A5A 100%);color:#fff;padding:56px 24px 40px;position:relative;overflow:hidden}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:420px;height:420px;border-radius:50%;background:radial-gradient(circle,rgba(18,181,165,.35),transparent 70%)}
+.hero::before{content:"";position:absolute;left:-80px;bottom:-140px;width:360px;height:360px;border-radius:50%;background:radial-gradient(circle,rgba(232,168,56,.22),transparent 70%)}
+.hero-inner{max-width:1180px;margin:0 auto;position:relative;z-index:1}
+.eyebrow{display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.2);padding:6px 14px;border-radius:999px;font-size:13px;letter-spacing:.5px}
+.hero h1{font-size:clamp(28px,4vw,44px);line-height:1.25;margin:18px 0 10px}
+.hero h1 span{color:#5EEAD4}
+.hero p.sub{font-size:16px;color:#CBD5E1;max-width:860px;margin:0}
+.hero-meta{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+.chip{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.18);padding:8px 14px;border-radius:999px;font-size:13px}
+.chip b{color:#fff}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:28px}
+.stat{background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.14);border-radius:14px;padding:16px}
+.stat .num{font-size:28px;font-weight:800;color:#fff;line-height:1}
+.stat .lbl{font-size:13px;color:#CBD5E1;margin-top:6px}
+@media(max-width:900px){.stats{grid-template-columns:repeat(2,1fr)}}
+/* layout */
+.wrap{max-width:1180px;margin:0 auto;padding:0 24px}
+.toc{position:sticky;top:0;z-index:50;background:rgba(255,255,255,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.toc-inner{max-width:1180px;margin:0 auto;padding:10px 24px;display:flex;gap:8px;overflow-x:auto;align-items:center}
+.toc a{white-space:nowrap;font-size:13px;padding:7px 12px;border-radius:999px;color:var(--navy);border:1px solid transparent}
+.toc a:hover{background:#ECFDF5;text-decoration:none;border-color:#A7F3D0}
+.toc a.active{background:var(--navy);color:#fff}
+.toc .spacer{flex:1}
+.btn{border:1px solid var(--line);background:#fff;padding:7px 14px;border-radius:999px;font-size:13px;cursor:pointer;color:var(--navy)}
+.btn:hover{background:#F1F5F9}
+.btn.primary{background:var(--teal);color:#fff;border-color:var(--teal)}
+/* sections */
+section.block{background:var(--card);border:1px solid var(--line);border-radius:20px;box-shadow:var(--shadow);margin:28px 0;overflow:hidden}
+.sec-head{display:flex;gap:18px;align-items:flex-start;padding:28px 28px 0}
+.sec-num{flex:0 0 64px;height:64px;border-radius:16px;background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1}
+.sec-num .n{font-size:24px;font-weight:800}
+.sec-num .t{font-size:11px;opacity:.85;margin-top:2px}
+.sec-head h2{margin:2px 0 6px;font-size:24px;color:var(--navy)}
+.sec-head .desc{color:var(--muted);font-size:14px;margin:0}
+.ppt-tag{display:inline-block;background:#FEF3C7;color:#92400E;border:1px solid #FDE68A;font-size:12px;padding:3px 10px;border-radius:999px;margin-left:8px;vertical-align:middle}
+.sec-body{padding:20px 28px 28px}
+.quote{border-left:4px solid var(--teal);background:#F0FDFA;padding:16px 18px;border-radius:0 12px 12px 0;font-size:16px;color:var(--navy);font-weight:600}
+.quote small{display:block;font-weight:400;color:var(--muted);font-size:13px;margin-top:6px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+@media(max-width:900px){.grid2,.grid3{grid-template-columns:1fr}}
+.card{border:1px solid var(--line);border-radius:14px;padding:18px;background:#fff}
+.card h3{margin:0 0 10px;font-size:16px;color:var(--navy);display:flex;align-items:center;gap:8px}
+.card h3 .dot{width:10px;height:10px;border-radius:50%;background:var(--teal);display:inline-block}
+.card p,.card li{font-size:14px;color:#334155}
+.card ul{margin:8px 0;padding-left:20px}
+.card li{margin:4px 0}
+.badge{display:inline-block;font-size:12px;padding:2px 10px;border-radius:999px;font-weight:600}
+.badge.teal{background:#CCFBF1;color:#0F766E}
+.badge.blue{background:#DBEAFE;color:#1E40AF}
+.badge.gold{background:#FEF3C7;color:#92400E}
+.badge.red{background:#FEE2E2;color:#991B1B}
+.badge.gray{background:#F1F5F9;color:#475569}
+table{width:100%;border-collapse:collapse;font-size:14px;margin:12px 0}
+th{background:var(--navy);color:#fff;text-align:left;padding:12px 14px;font-weight:600}
+td{padding:12px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+tr:nth-child(even) td{background:#F8FAFC}
+table.round{border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+.kv{display:grid;grid-template-columns:140px 1fr;gap:8px 16px;font-size:14px}
+.kv dt{color:var(--muted);font-weight:600}
+.kv dd{margin:0}
+.callout{background:#FFF7ED;border:1px solid #FED7AA;border-radius:12px;padding:14px 16px;font-size:13px;color:#7C2D12;margin:14px 0}
+.callout.blue{background:#EFF6FF;border-color:#BFDBFE;color:#1E3A5F}
+.callout.green{background:#F0FDF4;border-color:#BBF7D0;color:#14532D}
+.mermaid{background:#0F172A;color:#E2E8F0;border-radius:14px;padding:18px;overflow-x:auto;font-size:13px;line-height:1.6}
+.mermaid-note{font-size:12px;color:var(--muted);margin-top:8px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}
+.tab-btn{padding:9px 16px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;font-size:14px;color:var(--navy)}
+.tab-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+.tab-panel{display:none}
+.tab-panel.active{display:block}
+.steps{display:flex;flex-direction:column;gap:10px;margin:14px 0}
+.step{display:flex;gap:12px;align-items:flex-start;background:#F8FAFC;border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.step .no{flex:0 0 28px;height:28px;border-radius:50%;background:var(--teal);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+.step .txt{font-size:14px}
+.step .txt b{color:var(--navy)}
+.flow-arrow{text-align:center;color:var(--muted2);font-size:18px;line-height:1}
+.channel{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+@media(max-width:900px){.channel{grid-template-columns:1fr}}
+.channel .card{position:relative}
+.channel .card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;border-radius:14px 14px 0 0;background:linear-gradient(90deg,var(--teal),var(--navy))}
+.interface-diagram{display:grid;grid-template-columns:1fr 80px 1fr;gap:12px;align-items:center;margin:16px 0}
+@media(max-width:900px){.interface-diagram{grid-template-columns:1fr}}
+.if-box{border:2px solid var(--line);border-radius:14px;padding:16px;text-align:center;background:#fff}
+.if-box.center{background:var(--navy);color:#fff;border-color:var(--navy)}
+.if-box h4{margin:0 0 8px;font-size:15px}
+.if-arrow{text-align:center;font-size:22px;color:var(--muted)}
+@media(max-width:900px){.if-arrow{transform:rotate(90deg)}}
+.risk-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:900px){.risk-grid{grid-template-columns:1fr}}
+.level{display:flex;align-items:center;gap:12px}
+.level .bar{flex:1;height:10px;background:#F1F5F9;border-radius:999px;overflow:hidden}
+.level .fill{height:100%;border-radius:999px}
+.demo-steps{counter-reset:demo}
+.demo-step{display:flex;gap:16px;padding:16px;border:1px solid var(--line);border-radius:14px;margin:12px 0;background:#fff}
+.demo-step .time{flex:0 0 90px;text-align:center}
+.demo-step .time .t{font-weight:800;color:var(--teal);font-size:18px}
+.demo-step .time .d{font-size:12px;color:var(--muted)}
+.demo-step h4{margin:0 0 6px;color:var(--navy)}
+.demo-step p{margin:0;font-size:14px;color:#475569}
+code{background:#F1F5F9;padding:2px 6px;border-radius:6px;font-size:13px;color:#0F172A}
+.copy-btn{font-size:12px;padding:4px 10px;border-radius:999px;border:1px solid var(--line);background:#fff;cursor:pointer;margin-left:8px}
+footer{background:var(--navy);color:#CBD5E1;padding:32px 24px;margin-top:40px}
+footer .wrap{max-width:1180px}
+footer h3{color:#fff;margin:0 0 10px}
+footer p{font-size:13px;margin:6px 0}
+.print-only{display:none}
+@media print{
+  .toc,.btn,#progress{display:none!important}
+  body{background:#fff}
+  section.block{box-shadow:none;break-inside:avoid;page-break-inside:avoid}
+  .hero{padding:24px}
+  .print-only{display:block}
+}
+</style>
+</head>
+<body>
+<div id="progress"></div>
+
+<header class="hero">
+  <div class="hero-inner">
+    <span class="eyebrow">招商信诺 · Cigna &amp; CMB Health &nbsp;|&nbsp; 系统汇报 · 8 页母稿</span>
+    <h1>企业体检福利平台（HMSC）<br><span>一站式体检与福利履约平台</span></h1>
+    <p class="sub">面向 B 端企业团检与 C 端个险/散客，打通检前预约、检中履约、检后解读及报销直赔全闭环。本页严格对齐《汇报梳理内容》8 项提纲，每 1 章节对应 1 页 PPT，可直接作为制作汇报 PPT 的母稿。</p>
+    <div class="hero-meta">
+      <span class="chip">统一术语：主订单 / 预约单 / 持有人 / 体检权益 / 常规报销 / 积分报销 / 商保直赔</span>
+      <span class="chip">核心中枢：<b>member-core-health</b></span>
+      <span class="chip">渠道：PC / H5 / 公众号 / 小程序 / APP / 大客户免密</span>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="num">20+</div><div class="lbl">头部标杆企业客户<br>招行总行 · 西门子 · 特斯拉 · 诺华 等</div></div>
+      <div class="stat"><div class="num">17+</div><div class="lbl">民营体检连锁直连<br>+ 公立医院协同履约双轨</div></div>
+      <div class="stat"><div class="num">8 大</div><div class="lbl">下游核心系统<br>健康核心 · 财务 · 积分 · TBDS 等</div></div>
+      <div class="stat"><div class="num">4 路</div><div class="lbl">权益赋权方式<br>HR导入 · 免密赋权 · 体检卡 · 自费购</div></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc" id="toc">
+  <div class="toc-inner">
+    <a href="#s1">01 概述</a>
+    <a href="#s2">02 功能清单</a>
+    <a href="#s3">03 复杂场景</a>
+    <a href="#s4">04 入口渠道</a>
+    <a href="#s5">05 接口情况</a>
+    <a href="#s6">06 下游数据</a>
+    <a href="#s7">07 变更与运维</a>
+    <a href="#s8">08 演示环境</a>
+    <span class="spacer"></span>
+    <button class="btn" onclick="window.print()">🖨 打印 / 导出 PDF</button>
+    <button class="btn primary" onclick="document.getElementById('s8').scrollIntoView({behavior:'smooth'})">演示脚本 →</button>
+  </div>
+</nav>
+
+<div class="wrap">
+
+<!-- 01 -->
+<section class="block" id="s1">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">01</span><span class="t">PPT P1</span></div>
+    <div>
+      <h2>系统一句话简单概述 <span class="ppt-tag">PPT 第 1 页</span></h2>
+      <p class="desc">用简洁语言描述系统是什么、做什么用的 —— 本页即汇报开场定调页。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="quote">
+      招商信诺面向 B 端企业团检与 C 端个险/散客的一站式体检与福利履约平台，打通检前预约、检中履约、检后解读及报销直赔全闭环。
+      <small>一句话定位 · 汇报时直接朗读本句即可完成开场。</small>
+    </div>
+
+    <div class="grid3" style="margin-top:16px">
+      <div class="card">
+        <h3><span class="dot"></span>业务布局</h3>
+        <ul>
+          <li>覆盖 <b>移动端 + PC 端</b>，以 <b>企业体检（员工/入职）、家属体检、常规报销、积分报销</b> 为核心主干</li>
+          <li>配套 <b>健康商城（非体检服务）、HRA 健康测评、电子健康档案（EHR）</b> 及 <b>MIS 运营后台</b></li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3><span class="dot"></span>服务客户（20+ 标杆）</h3>
+        <p>招商银行总行、西门子（中国/医疗/能源）、特斯拉、诺华、惠普、爱马仕、花旗、蒙牛、费列罗、嘉士伯、三井住友银行、东方证券、华泰联合证券、招商基金、招商财富、普利司通、汉高、利洁时等。</p>
+      </div>
+      <div class="card">
+        <h3><span class="dot"></span>核心价值</h3>
+        <ul>
+          <li><b>B 端：</b>多租户独立皮肤/主题 + 中英双语，承载统付、积分发放、外院报销、商保直赔、对账单、HR 异常监控</li>
+          <li><b>C 端：</b>多渠道触达，17+ 连锁实时预约 + 公立协同，家属积分共济、AI 解读、家庭报告聚合</li>
+          <li><b>运营合规：</b>统一网关（RSA+JWT）、字段脱敏、DLP 审计，保障 PHI 与资金结算合规</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="callout blue">
+      <b>汇报要点：</b> 强调“<b>一站式 + 全闭环</b>”—— 检前（预约/选检）→ 检中（双轨履约/到检）→ 检后（OCR 归档/AI 解读）→ 报销直赔（常规/积分/商保），同一套后端 + 多租户配置支撑全渠道。
+    </div>
+  </div>
+</section>
+
+<!-- 02 -->
+<section class="block" id="s2">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">02</span><span class="t">PPT P2</span></div>
+    <div>
+      <h2>系统主要功能清单 <span class="ppt-tag">PPT 第 2 页</span></h2>
+      <p class="desc">按「核心主模块」与「外围配套能力」分层呈现 —— 汇报时先讲核心，再讲配套。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <h3 style="color:var(--navy);margin:0 0 8px">1）核心主模块（体检服务与报销核心）</h3>
+    <table class="round">
+      <thead><tr><th style="width:16%">业务模块</th><th style="width:42%">核心功能点</th><th>关键业务能力亮点</th></tr></thead>
+      <tbody>
+        <tr><td><b>企业体检</b><br><span class="badge teal">核心</span></td><td>员工体检、<b>入职体检</b>、优惠套餐、加项选购、<b>体检卡激活</b>、<b>套餐对比/推荐</b>、预约（改期/取消）、<b>体检提醒</b>、体检报告、<b>小诺健康 AI 解读</b>、<b>检后管理</b>、<b>专属客服</b>、<b>英文版</b></td><td>检前-检中-检后全流程；线上 17+ 民营直连 + 线下公立人工协调双轨；中英双语；性别/婚否适检门禁、权益到期拦截、项目屏蔽日、小诺 AI（多 Agent）及 C24/C59 异步医生解读</td></tr>
+        <tr><td><b>家属体检</b></td><td>家属产品包（G）选购、家属信息维护、多持有人购物车合并下单、<b>积分+现金</b>组合结算、家属预约、家庭报告聚合查阅</td><td>企业不统付，支持自费或划扣本人福利积分（<b>1:1 家属积分共济</b>）；主账号一键切换查看本人及家属报告</td></tr>
+        <tr><td><b>常规报销</b></td><td><b>体检报销</b>、<b>复检报销</b>、疫苗及大客户定制报销（如 KPMG）、发票/附件上传、银行卡维护、审核状态追踪</td><td>外院垫资后事后提交发票，完整流转「审核中 → 待付款 → 已付款 / 失败处理」，推送核心财务打款</td></tr>
+        <tr><td><b>积分报销</b></td><td>福利积分额度校验、外院健康消费发票报销（体检/洁牙/眼科/健身卡/疫苗）、收款绑定、审核与打款回执追踪</td><td>积分 1:1 核算审核金额并驱动核心财务打款</td></tr>
+        <tr><td><b>商保直赔</b><br><span class="badge gold">特殊结算</span></td><td>B 端团单（EWP）与 C 端散客/个险（SWP）理赔标识门禁、身份证 OCR、手写电子签名、理赔申请书 PDF 动态盖章合成、专线 SFTP 归档</td><td>免垫资、零自付体检，自动归档至 211 保险核心完成理赔结案</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--navy);margin:20px 0 8px">2）外围配套能力（非体检服务与运营支撑）</h3>
+    <table class="round">
+      <thead><tr><th style="width:20%">配套模块</th><th style="width:22%">核心职责</th><th>说明</th></tr></thead>
+      <tbody>
+        <tr><td><b>健康商城</b>（非体检）</td><td>服务/实物商品购买、订单查询/取消、退款、服务使用、<b>物流配送</b>、<b>申请开票</b>、自定义分类</td><td>体检卡券零售（经“体检卡激活”生成正式权益后锁死不可退）；实物支持退货退款及回调退积分</td></tr>
+        <tr><td><b>HRA 健康测评</b></td><td>生活习惯/家族病史问卷、Drools 规则引擎计算风险标签、个性化套餐/加项推荐</td><td>与检前环节联动，测评结果自动推荐并勾选加项包</td></tr>
+        <tr><td><b>电子健康档案 EHR</b></td><td>历年正式报告归档查阅、结构化异常指标趋势对比（对接 HMES）</td><td>自主上传的外院历史报告物理隔离，不污染官方主档</td></tr>
+        <tr><td><b>MIS 运营后台</b></td><td>20 个标准运营模块</td><td><b>企业/客户管理</b>（企业、客户、用户、皮肤、公告、系统配置）· <b>权益与交易</b>（权益、领取管理、活动、商品、订单、预约单）· <b>财务与报销</b>（发票、企业对账单、报销、复检报销）· <b>报告与数据</b>（报告、体检测评、综合测评、报表）<br>支撑大客户上线配置、多租户换肤、公立人工核销与财务对账闭环（含招行 CMB 专属渠道）</td></tr>
+      </tbody>
+    </table>
+    <div class="callout green"><b>汇报提示：</b> 本页建议做成“左核心 5 模块 + 右配套 4 模块”的两栏图，核心模块用大卡片突出，配套模块用小卡片收尾。</div>
+  </div>
+</section>
+
+<!-- 03 -->
+<section class="block" id="s3">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">03</span><span class="t">PPT P3</span></div>
+    <div>
+      <h2>复杂业务处理场景及流程图 <span class="ppt-tag">PPT 第 3 页</span></h2>
+      <p class="desc">聚焦纯业务语义与核心控制点（不堆砌底层 URL/队列名），精选 3 条最体现系统复杂度的主干链路。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="callout">
+      <b>核心模型（贯穿 3 个场景）：</b> 单链归属 <code>体检权益(Benefit) ➔ 主订单(Order，含0元统付单) ➔ 预约单(Appointment)</code>；顶层配置 <code>企业项目(Project) ➔ 团单(TeamOrder) ➔ 产品包(P员工/G家属)</code>。严格区分主订单 / 预约单 / 持有人 / 体检权益 / 常规报销 / 积分报销 / 商保直赔。
+    </div>
+
+    <div class="tabs" role="tablist">
+      <button class="tab-btn active" data-tab="t1">场景 1 · 企业体检全链路</button>
+      <button class="tab-btn" data-tab="t2">场景 2 · 家属+积分结算</button>
+      <button class="tab-btn" data-tab="t3">场景 3 · 报销审核打款</button>
+    </div>
+
+    <!-- Tab 1 -->
+    <div class="tab-panel active" id="t1">
+      <div class="card" style="margin-bottom:14px">
+        <h3><span class="dot"></span>场景 1：企业体检端到端全链路与双轨履约（6 阶段闭环）</h3>
+        <p><b>复杂点：</b>4 路权益赋权 + 两道分级合规门禁（选检前商保直赔门禁 vs 预约前年度劳资承诺书）+ 智能选检（TBDS 问卷/报告 AI 推荐与套餐对比）+ 线上 17+ 民营直连 vs 线下公立人工协同双轨 + 5 类履约变更/容灾策略 + 大模型 OCR 归档与双轨解读。</p>
+      </div>
+      <div class="mermaid" id="m1">flowchart TD
+    A["顶层配置与4路权益发放<br/>Project → TeamOrder(1:N) → ProductPackage(P员工/G家属)<br/>生成体检权益(Benefit)：HR批量导入 / ToB免密动态赋权 / 体检卡激活 / 自费优惠购"] --&gt; B["白名单/免密登录 + 一级隐私授权"]
+    B --&gt; C{"团单/保单是否开启商保直赔?"}
+    C --&gt;|"是(EWP/SWP)"| C1["身份证OCR + 手写电子签名<br/>合成理赔PDF → 专线SFTP归档211核心"]
+    C --&gt;|"否"| D
+    C1 --&gt; D["智能选检辅助(可选 · TBDS)<br/>问卷/历史报告AI推荐 &amp; 标准医学字典套餐对比"]
+    D --&gt; E["双向选购(套餐↔分院) + 硬校验<br/>适检门禁 / 互斥与预算帽 / 套餐门店交集 / 屏蔽日与停业策略"]
+    E --&gt; F["确立主订单(Order)<br/>0元统付 / 自费积分下单 / 取消重约回流"]
+    F --&gt; G{"二级合规门禁<br/>是否需签署年度劳资健康承诺书?"}
+    G --&gt;|"是(未签)"| G1["在线签署年度劳资健康承诺书并存证"]
+    G --&gt;|"否 / 已签"| H
+    G1 --&gt; H["合并原子封装预约单(Appointment)<br/>主套餐 + 全部加项一站式交付"]
+    H --&gt; I{"供应商履约双轨"}
+    I --&gt;|"线上17+民营直连"| I1["调机构API实时锁单<br/>成功(02) / 超时售罄即时落标失败(07)"]
+    I --&gt;|"线下公立 / 特批协调 / 团检报名(0030)"| I2["团检专属门店过滤 + 落标groupCheck(Y/N)<br/>生成申请单 → 导出Excel → 客服人工协调确认"]
+    I1 &amp; I2 -.-&gt; J["同店改期(线下刷新groupCheck) / 当日禁取消 / 过期熔断<br/>分院停业降级协调 / 超期未到检自动释放"]
+    I1 &amp; I2 --&gt; K["双轨到检同步(已到检04)<br/>线上定时轮询 / 线下MIS核销 → 确立供应商采购结算里程碑 + 口碑评价"]
+    K --&gt; L["原版PDF报告 → 统一大模型OCR解析归档HMES<br/>(外院自传历史报告物理隔离不入主档)"]
+    L --&gt; M["报告增值与智能服务闭环<br/>1. 小诺健康AI：国密SM4/SM3多Agent免登 + 隐私门禁 + 短效RSA令牌回查EWP/SWP报告<br/>2. C24·C59三方医生解读：四条件自动申请 / 手动前置门禁<br/>3. 保险在线客服(BGJD/PTZX AES-GCM免登) / 家庭报告共用 / B端HR异常监控看板"]</div>
+      <p class="mermaid-note">图 1 · 企业体检 6 阶段闭环（Mermaid 渲染；若离线打开，下方步骤清单即为等价文字版，可直接用于 PPT 备注）。</p>
+      <div class="steps">
+        <div class="step"><span class="no">1</span><span class="txt"><b>权益发放：</b>Project → TeamOrder(1:N) → 产品包(P/G) 生成 Benefit（HR导入 / 免密赋权 / 体检卡激活 / 自费购）→ 白名单/免密登录 + 隐私授权。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">2</span><span class="txt"><b>一级门禁（商保直赔）：</b>EWP/SWP 开启时做身份证 OCR + 手写签名，合成理赔 PDF 经 SFTP 归档 211 核心。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">3</span><span class="txt"><b>智能选检 + 硬校验：</b>TBDS AI 推荐/套餐对比 → 双向选购（套餐↔分院）+ 适检/互斥/预算帽/交集/屏蔽日校验 → 确立主订单 Order。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">4</span><span class="txt"><b>二级门禁（劳资承诺书）：</b>未签则在线签署存证 → 合并原子封装预约单 Appointment（主套餐+加项一站式交付）。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">5</span><span class="txt"><b>双轨履约：</b>线上 17+ 直连实时锁单（02 成功 / 07 失败）；线下公立/团检报名（0030）落标 groupCheck → 导出 Excel 人工协调。含改期/当日禁取消/过期熔断/停业降级/超期释放等容灾。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">6</span><span class="txt"><b>到检与报告闭环：</b>双轨同步已到检（04）确立结算里程碑 → 原版 PDF 经大模型 OCR 归档 HMES → 小诺 AI / C24·C59 医生解读 / 在线客服 / HR 异常看板。</span></div>
+      </div>
+    </div>
+
+    <!-- Tab 2 -->
+    <div class="tab-panel" id="t2">
+      <div class="card" style="margin-bottom:14px">
+        <h3><span class="dot"></span>场景 2：家属体检 + 多平台积分两阶段结算与逆向退费</h3>
+        <p><b>复杂点：</b>多持有人（员工升级/加项 + 家属产品包 G）合并结算、1:1 积分按法定优先级落标子订单、外部积分平台（核心积分 / 福粒 / 薪福通）“两阶段冻结转实扣 + 双边镜像账本防超扣 + SKU 级穿透”，以及“前置级联取消预约 + 资金退款异步回调驱动退积分”的事务一致性。</p>
+      </div>
+      <div class="mermaid" id="m2">flowchart TD
+    A["多持有人选品加车(CartItem)<br/>员工升级/加项 + 家属产品包(G)<br/>(草稿阶段不占排期容额)"] --&gt; B["提交生成瞬态组合订单(CombinationOrder)<br/>按1单=1持有人拆单 + 排期临时占容15分钟"]
+    B --&gt; C["积分1:1优先级分摊落标子订单(SubOrder)<br/>1. 先抵主干套餐升级/加价差额<br/>2. 再抵自选加项包 / 家属包积分共济"]
+    C --&gt; D["两阶段结算-阶段1: 并发双边预冻结<br/>外部积分平台(福粒/薪福通SKU级扣减) + 核心镜像账本<br/>(超时自动查单确认终态)"]
+    D --&gt; E{"是否需补现金?"}
+    E --&gt;|"需自付差额"| F["调起招行/EPAY收银台支付"]
+    E --&gt;|"纯积分全额抵扣"| G
+    F --&gt;|"支付成功异步回调"| G["两阶段结算-阶段2: 转实扣<br/>积分转实扣 + 清理购物车<br/>组合订单解体为各自独立主订单(Order)"]
+    F --&gt;|"15分钟超时未付/取消"| H["定时任务自动取消订单<br/>释放15分钟占容 + 并发解冻双边积分"]
+    G --&gt; I["逆向退款链路(用户申请退款)"]
+    I --&gt; J["前置强校验: 级联取消关联预约单(Appointment)<br/>释放分院排期名额"]
+    J --&gt; K["发起EPAY现金原路退款"]
+    K --&gt;|"资金退款异步成功回调"| L["回调驱动并发退回外部与核心镜像积分<br/>(异常查单落补偿表 → 定时重试/超限告警转人工)"]</div>
+      <p class="mermaid-note">图 2 · 家属+积分两阶段结算与逆向退费。</p>
+      <div class="steps">
+        <div class="step"><span class="no">1</span><span class="txt"><b>加车拆单：</b>多持有人选品（CartItem，草稿不占容额）→ 提交生成组合订单，按 1 单=1 持有人拆单 + 15 分钟临时占容。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">2</span><span class="txt"><b>积分分摊：</b>1:1 按优先级落标子订单（先抵主干升级差额，再抵加项/家属包共济）。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">3</span><span class="txt"><b>两阶段结算：</b>阶段 1 双边预冻结（外部平台 SKU 级 + 核心镜像账本，超时查单）；需补现金则调起招行/EPAY；阶段 2 转实扣、清购物车、组合订单解体为独立主订单。15 分钟超时自动取消并解冻。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">4</span><span class="txt"><b>逆向退费：</b>前置级联取消预约单释放排期 → EPAY 原路退款 → 异步回调驱动并发退积分（异常落补偿表，定时重试/超限转人工）。</span></div>
+      </div>
+    </div>
+
+    <!-- Tab 3 -->
+    <div class="tab-panel" id="t3">
+      <div class="card" style="margin-bottom:14px">
+        <h3><span class="dot"></span>场景 3：常规报销 &amp; 积分报销审核打款链路</h3>
+        <p><b>复杂点：</b>区分常规体检代报销（<code>01-体检报销</code>与预约互斥、<code>02-复检报销</code>独立共存，支持员工/家属及双抬头发票、<code>08-待寄送原件</code>）与积分报销（仅员工本人个人发票、1:1 预冻结核心/薪福通/福粒三类积分源、回调已付款转实扣）；统一遵循<b>全额核准不部分核减</b>及 <b><code>05-付款失败</code> 原单改卡免复审直推</b>。</p>
+      </div>
+      <div class="mermaid" id="m3">flowchart TD
+    A["员工/家属发起事后报销申请"] --&gt; B{"报销类型分支"}
+    B --&gt;|"常规报销(员工/家属 · 双抬头发票)"| B1["01体检报销：权益互斥校验(禁与线上预约并存)<br/>02复检报销：校验独立复检权益(可与首检共存)"]
+    B --&gt;|"积分报销(仅员工本人 · 个人发票)"| B2["体检 / 洁牙 / 眼科 / 健身卡 / 疫苗<br/>按1:1预冻结积分(核心/薪福通/福粒三类积分源)"]
+    B1 --&gt; C1["提交入库：01-审核中<br/>(按需流转 08-待寄送发票原件核验)"]
+    B2 --&gt; C2["提交入库：01-审核中 (无原件寄送)"]
+    C1 &amp; C2 --&gt; D{"MIS审核与用户操作(全额核准，不支持部分核减)"}
+    D --&gt;|"用户撤销 / 审核驳回"| D1["04-已取消 / 06-审核未通过<br/>积分报销驱动积分原路解冻返还"]
+    D --&gt;|"全额审核通过"| E["02-待付款<br/>推送核心财务系统打款"]
+    E --&gt; F{"核心财务异步打款回调"}
+    F --&gt;|"03-已付款"| F1["报销闭环<br/>积分报销驱动冻结积分转实扣(失败回滚02记异常)"]
+    F --&gt;|"05-付款失败"| F2["积分报销维持冻结态不退回<br/>原单号修改银行卡 → 跳过人工复审直推财务"]
+    F2 --&gt; E</div>
+      <p class="mermaid-note">图 3 · 常规报销 &amp; 积分报销审核打款链路。</p>
+      <div class="steps">
+        <div class="step"><span class="no">1</span><span class="txt"><b>类型分支：</b>常规报销（01 互斥 / 02 独立共存，双抬头） vs 积分报销（仅本人个人发票，1:1 预冻结三类积分源）。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">2</span><span class="txt"><b>提交入库：</b>01-审核中（常规按需流转 08-待寄送原件核验；积分无原件寄送）。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">3</span><span class="txt"><b>审核：</b>全额核准不支持部分核减；撤销/驳回 → 04-已取消 / 06-未通过，积分原路解冻返还；通过 → 02-待付款推送财务。</span></div>
+        <div class="flow-arrow">↓</div>
+        <div class="step"><span class="no">4</span><span class="txt"><b>打款回调：</b>03-已付款闭环（积分转实扣，失败回滚 02 记异常）；05-付款失败维持冻结态，原单改卡免复审直推财务。</span></div>
+      </div>
+    </div>
+
+    <div class="callout blue"><b>PPT 建议：</b> 本页若 1 页放不下，建议拆为 1 页总览 + 3 张子页（每场景 1 页），总览页只保留 6 阶段/两阶段/状态机三条主干线。</div>
+  </div>
+</section>
+
+<!-- 04 -->
+<section class="block" id="s4">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">04</span><span class="t">PPT P4</span></div>
+    <div>
+      <h2>系统页面入口渠道 <span class="ppt-tag">PPT 第 4 页</span></h2>
+      <p class="desc">「独立多端门户 + 内部宿主端嵌入 + 外部大客户免密接入」三层渠道矩阵，同一套后端与多租户配置支撑全渠道露出。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="channel">
+      <div class="card">
+        <h3>自有独立入口 <span class="badge teal">3 个</span></h3>
+        <ul>
+          <li><b>PC 端门户</b>（<code>new-pc</code>）— PC Web，企业员工/家属，账号密码/验证码/专属域名登录</li>
+          <li><b>移动端 H5</b>（<code>new-mobile</code>）— Mobile H5，企业员工/家属，专属短链/二维码直达</li>
+          <li><b>MIS 运营后台</b>（<code>hmsc-mis-web</code>）— 内网 PC Web，内部运营/客服，企业配置、名单导入、公立核销与审核</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>内部宿主端露出 <span class="badge blue">嵌套 H5</span></h3>
+        <ul>
+          <li><b>微信公众号</b>：「招商信诺健康管理服务」— 公众号菜单跳转移动端 H5</li>
+          <li><b>微信小程序</b>：「招商信诺服务中心小程序」— 小程序嵌 H5，服务入口直达</li>
+          <li><b>自有与合作 APP</b>：「完美人生」「掌上健康」「招行 APP」— APP 内嵌 H5，保单/招行渠道免二次查找</li>
+        </ul>
+      </div>
+      <div class="card">
+        <h3>外部大客户免密入口 <span class="badge gold">免密中转</span></h3>
+        <ul>
+          <li><b>薪福通</b>（招乎入口）、<b>Aon（怡安）、蒙牛、金风、希尔顿、西门子、特斯拉、远洋、丰享</b> 等</li>
+          <li>免密中转页（<code>/jump/:projectCode</code>）— 员工从企业自有门户/企微/招乎一键免密跳转，系统按策略自动鉴权并动态赋权</li>
+        </ul>
+      </div>
+    </div>
+    <table class="round" style="margin-top:16px">
+      <thead><tr><th>渠道类别</th><th>具体入口</th><th>载体</th><th>独立入口？</th><th>人群与接入</th></tr></thead>
+      <tbody>
+        <tr><td>自有独立</td><td>PC 门户 / 移动 H5 / MIS 后台</td><td>PC Web / Mobile H5 / 内网 Web</td><td><b>是</b></td><td>员工/家属直接登录；运营内部使用</td></tr>
+        <tr><td>内部宿主</td><td>公众号 / 小程序 / 完美人生·掌上健康·招行 APP</td><td>菜单/小程序/APP 嵌 H5</td><td>嵌套 H5</td><td>个人及企业客户从宿主入口跳转</td></tr>
+        <tr><td>外部大客户</td><td>薪福通、Aon、蒙牛、金风、希尔顿、西门子、特斯拉、远洋、丰享等</td><td>免密中转页</td><td>外部系统嵌入</td><td>企业门户/企微/招乎一键免密，自动鉴权+动态赋权</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 05 -->
+<section class="block" id="s5">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">05</span><span class="t">PPT P5</span></div>
+    <div>
+      <h2>系统接口情况（对外提供 / 主动调用） <span class="ppt-tag">PPT 第 5 页</span></h2>
+      <p class="desc">上下游口径：上游 = 调用/接入 HMSC 的宿主渠道与外部大客户系统；下游 = HMSC 依赖的底层核心与履约底座（以 <code>member-core-health</code> 为核心中枢）。本页聚焦接口调用关系。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="interface-diagram">
+      <div class="if-box"><h4>⬆ 上游（调用方）</h4><p style="margin:0;font-size:13px;color:#475569">内部宿主渠道 · 外部大客户系统<br>完美人生 / 掌上健康 / 招行 APP / 小程序 / 公众号<br>薪福通 / Aon / 蒙牛 / 西门子 / 特斯拉 等</p></div>
+      <div class="if-arrow">⇄</div>
+      <div class="if-box center"><h4>HMSC 体检福利平台</h4><p style="margin:0;font-size:13px;opacity:.9">hmsc-gateway（RSA+JWT）<br>hmsc-edge-support（免密/回调）<br>member-core-health（健康核心代理）</p></div>
+    </div>
+    <div class="interface-diagram">
+      <div class="if-box center"><h4>HMSC</h4><p style="margin:0;font-size:13px;opacity:.9">Feign HTTP + RabbitMQ<br>异步回调 / SSE / SFTP 专线</p></div>
+      <div class="if-arrow">⇄</div>
+      <div class="if-box"><h4>⬇ 下游（依赖底座）</h4><p style="margin:0;font-size:13px;color:#475569">HMC 核心/财务 · 积分平台 · TBDS<br>211 保险核心 · HMES/OCR · 小诺 AI · 在线客服</p></div>
+    </div>
+
+    <h3 style="color:var(--navy);margin:18px 0 8px">1）对外提供接口（面向调用方 / 上游与回调方）</h3>
+    <table class="round">
+      <thead><tr><th>方向/类别</th><th>典型对接方</th><th>主要提供接口能力</th><th>接入方式</th></tr></thead>
+      <tbody>
+        <tr><td>服务上游：内部宿主渠道</td><td>完美人生、掌上健康、招行 APP、服务中心小程序、公众号</td><td>统一网关业务 API（登录鉴权、权益/套餐/分院查询、预约/改期/取消、报告查看、报销提交）</td><td><code>hmsc-gateway</code>（RSA+Base64+JWT）</td></tr>
+        <tr><td>服务上游：外部大客户系统</td><td>薪福通（招乎）、Aon、蒙牛、金风、希尔顿、西门子、特斯拉、远洋、丰享等</td><td>免密 SSO 中转与 Token 换取、动态权益同步、定制化项目接入</td><td><code>hmsc-edge-support</code> / 免密中转策略</td></tr>
+        <tr><td>服务内部关联系统</td><td>HMES（健康档案）、SWP（散客）、TBDS 等</td><td>体检权益/订单状态查询、报告数据联动与状态通知</td><td><code>hmsc-edge-support</code> / 内部接口</td></tr>
+        <tr><td>接收外部供应商回调</td><td>爱康、京东健康、嘉会、乐荐等支持异步回调的机构</td><td>接收预约状态变更、到检通知与报告生成异步回调</td><td><code>hmsc-edge-support</code> / 网关回调端点</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--navy);margin:20px 0 8px">2）主动调用接口（反查上游 + 调用 8 大下游核心与三方能力）</h3>
+    <table class="round">
+      <thead><tr><th>方向</th><th>目标系统</th><th>核心调用动作</th><th>通信方式</th></tr></thead>
+      <tbody>
+        <tr><td>反查上游</td><td><b>外部大客户认证接口</b>（薪福通、西门子、丰享等）</td><td>免密登录时反查外部企业 Token 有效性及员工岗位身份，触发动态赋权</td><td>Feign HTTP</td></tr>
+        <tr><td>调用下游</td><td><b><code>member-core-health</code>（健康核心代理）&amp; HMC 核心/财务</b></td><td>统调项目/权益/排期/15分钟占容、17+ 供应商锁单改退、报销/积分报销打款推送；订单/预约异步同步至 HMC 核心</td><td>Feign HTTP + RabbitMQ Direct</td></tr>
+        <tr><td>调用下游</td><td><b>外部积分福利平台 &amp; 支付网关</b>（核心积分/福粒/薪福通/招行 EPAY）</td><td>积分 SKU 级两阶段冻结/实扣/查单/退积分，收银台调起与原路退款</td><td>Feign HTTP / 异步回调</td></tr>
+        <tr><td>调用下游</td><td><b>大数据推荐服务 TBDS</b></td><td>问卷/历史体检报告 AI 智能套餐推荐（异步回调）及无状态套餐对比</td><td>Feign HTTP / 异步回调</td></tr>
+        <tr><td>调用下游</td><td><b><code>member-core-sign</code> &amp; 211 保险核心系统</b></td><td>商保直赔前置电子签名与 PDF 盖章合成，理赔资料归档 211 核心结案</td><td>Feign HTTP + 专线 SFTP</td></tr>
+        <tr><td>调用下游</td><td><b>健康档案 HMES/大模型 OCR &amp; 报告解读服务</b></td><td>PDF 报告分页推送大模型 OCR 解析归档 HMES；调用 Dify 普惠 AI 解读与派发 C24/C59 三方医生解读工单</td><td>Feign HTTP / SSE / 定时补偿</td></tr>
+        <tr><td>调用下游</td><td><b>小诺健康 AI &amp; 保险在线客服</b></td><td>国密 SM4 加密 + SM3 签名免登跳转小诺多 Agent（报告解读/心理咨询），短效 RSA 令牌供小诺安全回查 EWP/SWP 报告；AES-GCM 加密免登保险在线客服</td><td>国密免登 + 反向加密拉取 / AES-GCM</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<!-- 06 -->
+<section class="block" id="s6">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">06</span><span class="t">PPT P6</span></div>
+    <div>
+      <h2>从下游获取数据情况 <span class="ppt-tag">PPT 第 6 页</span></h2>
+      <p class="desc">HMSC 作为前置业务应用与履约编排层，核心主数据、履约终态与资金回执均从 8 大下游核心系统（以 <code>member-core-health</code> 为代理中枢）实时拉取或由定时任务（<code>hmsc-innovate-jobs</code> XXL-Job）异步获取。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <table class="round">
+      <thead><tr><th style="width:22%">下游数据来源</th><th style="width:38%">获取的核心数据内容</th><th style="width:18%">获取方式</th><th>业务用途</th></tr></thead>
+      <tbody>
+        <tr><td><b>HMC 核心系统</b><br>（经 <code>member-core-health</code>）</td><td>企业项目配置、团单与保单理赔标识、产品包（P/G）、标准/升级/加价/加项套餐、分院清单与营业状态、门店排期与上限、机构私有套餐编码映射</td><td>实时 Feign 查询</td><td>驱动前台套餐过滤、套餐门店交集匹配、排期日历渲染及商保直赔门禁判断</td></tr>
+        <tr><td><b>17+ 民营体检供应商</b><br>（经健康核心）</td><td>实时排期库存、预约锁单结果、机构侧取消状态、<b>已到检（04）状态</b>、出报告状态与 <b>原版 PDF 体检报告</b></td><td>实时调用 + XXL-Job 定时轮询 / 回调</td><td>驱动预约状态机扭转、确立供应商采购结算里程碑（04）、交付员工体检报告</td></tr>
+        <tr><td><b>外部积分福利平台</b><br>（核心积分/福粒/薪福通）</td><td>员工可用福利积分余额、积分有效期、预冻结/实扣/查单与退积分终态流水</td><td>实时调用 + 本地镜像对账</td><td>支持下单 1:1 积分抵扣、家属积分共济、积分报销额度校验与双边防超扣对账</td></tr>
+        <tr><td><b>核心财务系统</b><br>（经健康核心）</td><td>常规报销与积分报销的审核结果、核定金额、<b>财务打款状态回执</b>（待付款 / 已付款 / 付款失败）</td><td>异步同步 / 状态回传</td><td>向员工实时展示报销进度，触发付款失败后的异常排查与人工介入</td></tr>
+        <tr><td><b>大数据推荐服务 TBDS</b></td><td>问卷/历史报告异步打分推荐结果（主套餐/加项分值与补充项）、套餐共有项/差异项对比矩阵</td><td>异步回调 + 实时查询</td><td>支撑智能选检自动勾选推荐套餐与标准医学字典级套餐对比</td></tr>
+        <tr><td><b>大模型 OCR &amp; HMES 健康档案</b></td><td>全量 PDF 报告抽取的<b>结构化检测指标与异常指标（Abnormal Findings）</b>、历年历史体检档案</td><td>异步解析回写 / 查询</td><td>支撑移动端报告结构化查阅、历年趋势对比及 B 端 HR 异常监控看板</td></tr>
+        <tr><td><b>报告解读服务</b><br>（Dify AI &amp; C24/C59 三方医生）</td><td>Dify 即时指标成因与调理建议、三方专科医生出具的结构化<b>报告解读结论</b></td><td>实时 SSE / 异步工单回调</td><td>提供项目级普惠 AI 解读，以及永久挂载在权益报告项下的专业医生解读交付</td></tr>
+      </tbody>
+    </table>
+    <div class="callout"><b>汇报口径：</b> 第 5 页讲“调用关系”（谁调谁），第 6 页讲“数据内容”（拿到什么、用来干什么），两页互补不重复。</div>
+  </div>
+</section>
+
+<!-- 07 -->
+<section class="block" id="s7">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">07</span><span class="t">PPT P7</span></div>
+    <div>
+      <h2>改动需求频率 &amp; 运维问题情况 <span class="ppt-tag">PPT 第 7 页</span></h2>
+      <p class="desc">评估系统变更频率（高/中/低）和运维问题多少（多/正常/少）—— 本页结论先行，证据在后。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <div class="risk-grid">
+      <div class="card" style="border-top:4px solid var(--red)">
+        <h3>改动需求频率：<span class="badge red">高</span></h3>
+        <div class="level"><span style="font-size:13px;color:var(--muted)">低</span><div class="bar"><div class="fill" style="width:92%;background:var(--red)"></div></div><span style="font-size:13px;color:var(--muted)">高</span></div>
+        <p style="margin-top:10px">新签企业接入与存量企业年度方案更新均伴随大量定制开发，长期处于高频迭代状态。</p>
+      </div>
+      <div class="card" style="border-top:4px solid var(--amber)">
+        <h3>运维问题情况：<span class="badge gold">多</span></h3>
+        <div class="level"><span style="font-size:13px;color:var(--muted)">少</span><div class="bar"><div class="fill" style="width:78%;background:var(--amber)"></div></div><span style="font-size:13px;color:var(--muted)">多</span></div>
+        <p style="margin-top:10px">业务/运营配置复杂导致的配置错误与咨询类工单居多，叠加外部供应商与对账类运维排查。</p>
+      </div>
+    </div>
+
+    <div class="grid3" style="margin-top:16px">
+      <div class="card">
+        <h3>高频变更驱动源</h3>
+        <ol style="margin:8px 0;padding-left:20px;font-size:14px;color:#334155">
+          <li><b>新增企业定制开发</b>：专属免密对接、主题/文案、报销/问卷规则、劳资承诺书等（如毕马威、蒙牛、希尔顿、保乐力加、Aon 均有企业级独立逻辑）</li>
+          <li><b>存量企业年度方案迭代</b>：积分抵扣/报销规则调整、家属包补贴策略变化、新增加项包互斥/限额逻辑等</li>
+          <li><b>外部生态与合规整改</b>：17+ 供应商接口升级适配、安全渗透漏洞修复、数据脱敏/DLP 审计加固</li>
+        </ol>
+      </div>
+      <div class="card">
+        <h3>运维痛点</h3>
+        <ol style="margin:8px 0;padding-left:20px;font-size:14px;color:#334155">
+          <li><b>复杂配置错误与咨询（占比高）</b>：多租户配置链路长（项目配置、产品包 P/G、私有编码映射、分院白名单、屏蔽日、停业策略、Apollo 参数），任一环节错误即导致前台看不到套餐/分院或无法预约</li>
+          <li><b>外部供应商与线下履约异常</b>：17+ 机构偶发超时/排期不同步/锁单失败（07）；分院停业降级改约；公立依赖人工确认核销</li>
+          <li><b>资金/积分/报销与名单异常</b>：积分两阶段扣减/退积分对账、财务打款失败重试、HR 名单格式/四要素冲突需定时核查介入</li>
+        </ol>
+      </div>
+      <div class="card" style="background:#F0FDF4;border-color:#BBF7D0">
+        <h3>已落地治理措施</h3>
+        <ol style="margin:8px 0;padding-left:20px;font-size:14px;color:#334155">
+          <li><b>定制配置化（已落地）</b>：共性定制沉淀为标准可配置能力；高频改动集中在头部大客户超边界非标定制</li>
+          <li><b>配置培训与前置防错（已推进）</b>：高频错误整理成专项培训，后续结合 MIS 上线前完整性校验压降工单</li>
+          <li><b>全链路异常监控（已落地）</b>：已建设异常监控系统，业务与外部接口异常实时暴露告警，快速感知处置</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- 08 -->
+<section class="block" id="s8">
+  <div class="sec-head">
+    <div class="sec-num"><span class="n">08</span><span class="t">PPT P8</span></div>
+    <div>
+      <h2>系统演示、测试环境及账号 <span class="ppt-tag">PPT 第 8 页</span></h2>
+      <p class="desc">提供可演示的环境和测试账号 —— 汇报现场照此脚本 3~5 分钟即可完整演示。</p>
+    </div>
+  </div>
+  <div class="sec-body">
+    <h3 style="color:var(--navy);margin:0 0 8px">1）可演示测试环境信息（UAT）</h3>
+    <table class="round">
+      <thead><tr><th>端类型</th><th>环境</th><th>访问地址</th><th>测试账号</th><th>密码</th><th>备注</th></tr></thead>
+      <tbody>
+        <tr><td><b>PC 端门户</b></td><td>UAT</td><td><code>https://ewphlp-uat.cignacmbhealth.com/pc-web/newewp/#/common-login</code> <button class="copy-btn" onclick="copyText('https://ewphlp-uat.cignacmbhealth.com/pc-web/newewp/#/common-login')">复制</button></td><td><code>U26015</code> / <code>U26016</code> / <code>U26012</code> <button class="copy-btn" onclick="copyText('U26015')">复制 U26015</button></td><td><code>Aa@123456</code> <button class="copy-btn" onclick="copyText('Aa@123456')">复制</button></td><td>3 个通用演示账号，可直接登录演示企业体检全流程</td></tr>
+        <tr><td><b>移动端 H5</b></td><td>UAT</td><td><span class="badge gray">按需补充 H5 UAT 域名或二维码</span></td><td>同上或对应测试手机号</td><td><code>Aa@123456</code></td><td>如现场仅演示 PC 端，本行可省略</td></tr>
+        <tr><td><b>MIS 运营后台</b></td><td>UAT</td><td><span class="badge gray">按需补充 MIS UAT 地址</span></td><td><span class="badge gray">待补充运营测试账号</span></td><td><span class="badge gray">待补充</span></td><td>用于展示后台企业配置、名单导入与报销/公立审核</td></tr>
+      </tbody>
+    </table>
+
+    <h3 style="color:var(--navy);margin:20px 0 8px">2）推荐现场演示脚本（约 3~5 分钟）</h3>
+    <div class="demo-steps">
+      <div class="demo-step"><div class="time"><div class="t">~1′</div><div class="d">登录</div></div><div><h4>登录与权益总览</h4><p>使用 <code>U26015</code> 登录 UAT PC 门户，展示企业多租户主题、员工可用体检权益与福利积分余额。</p></div></div>
+      <div class="demo-step"><div class="time"><div class="t">~1.5′</div><div class="d">预约</div></div><div><h4>核心预约体验</h4><p>进入体检预约 → 展示套餐选择（主套餐/升级/加项与适检过滤）→ 展示“套餐与分院交集匹配”及排期选择。</p></div></div>
+      <div class="demo-step"><div class="time"><div class="t">~1′</div><div class="d">家属积分</div></div><div><h4>家属与积分亮点</h4><p>展示家属产品包选购、购物车合并结算与 1:1 积分抵扣分摊效果。</p></div></div>
+      <div class="demo-step"><div class="time"><div class="t">~1′</div><div class="d">闭环</div></div><div><h4>报销与报告闭环</h4><p>切换展示常规报销/积分报销提交页面（发票上传+银行卡）及已出体检报告/AI 解读视图。</p></div></div>
+    </div>
+
+    <div class="callout green"><b>演示前检查清单：</b> ① UAT 网络可达 ② 账号 <code>U26015 / Aa@123456</code> 可登录 ③ 权益/积分/排期数据已就绪 ④ 浏览器已登录态预热 ⑤ 备用账号 <code>U26016 / U26012</code> 已验证。</div>
+  </div>
+</section>
+
+<div class="callout blue" style="margin:8px 0 0">
+  <b>文档说明：</b> 本 HTML 严格对齐《汇报梳理内容》8 项提纲编写，每 1 章节对应 1 页 PPT，可直接作为制作汇报 PPT 的母稿。统一术语参考 CONTEXT.md（严格区分主订单 / 预约单 / 持有人 / 体检权益 / 常规报销 / 积分报销 / 商保直赔，及上下游口径）。流程图与 <code>domain-flows.md</code> / <code>integration-flows.md</code> 保持分层与术语一致。
+</div>
+
+</div>
+
+<footer>
+  <div class="wrap">
+    <h3>企业体检福利平台（HMSC）· 汇报母稿</h3>
+    <p>招商信诺面向 B 端企业团检与 C 端个险/散客的一站式体检与福利履约平台 — 检前预约 · 检中履约 · 检后解读 · 报销直赔 全闭环。</p>
+    <p>8 大块：01 概述 ｜ 02 功能清单 ｜ 03 复杂场景 ｜ 04 入口渠道 ｜ 05 接口情况 ｜ 06 下游数据 ｜ 07 变更与运维 ｜ 08 演示环境</p>
+    <p style="opacity:.7">建议汇报节奏：P1 定调（1′）→ P2 功能（2′）→ P3 场景（3′，可拆 3 子页）→ P4 渠道（1′）→ P5 接口（2′）→ P6 数据（1′）→ P7 变更运维（1′）→ P8 现场演示（3~5′）。</p>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<script>
+if (window.mermaid) {
+  mermaid.initialize({ startOnLoad:true, theme:'dark', flowchart:{ curve:'basis', padding:12 } });
+}
+// tabs
+document.querySelectorAll('.tab-btn').forEach(btn=>{
+  btn.addEventListener('click',()=>{
+    document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+    document.querySelectorAll('.tab-panel').forEach(p=>p.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+// progress + active toc
+const links=[...document.querySelectorAll('.toc a')];
+window.addEventListener('scroll',()=>{
+  const h=document.documentElement;
+  const p=h.scrollTop/(h.scrollHeight-h.clientHeight)*100;
+  document.getElementById('progress').style.width=p+'%';
+  let cur='';
+  document.querySelectorAll('section.block').forEach(s=>{
+    if(s.offsetTop<=h.scrollTop+120) cur=s.id;
+  });
+  links.forEach(a=>a.classList.toggle('active',a.getAttribute('href')==='#'+cur));
+});
+function copyText(t){
+  if(navigator.clipboard){navigator.clipboard.writeText(t).then(()=>alert('已复制：'+t));}
+  else{prompt('请手动复制：',t);}
+}
+</script>
+</body>
+</html>
