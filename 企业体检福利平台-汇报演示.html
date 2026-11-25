@@ -1,0 +1,1945 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>企业体检福利平台（HMSC）系统汇报（8大模块全景演示）</title>
+<style>
+    :root {
+        --primary: #0f2240;
+        --secondary: #0066cc;
+        --accent: #10b981;
+        --warning: #f59e0b;
+        --danger: #ef4444;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text-main: #1e293b;
+        --text-muted: #64748b;
+        --border: #cbd5e1;
+    }
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+        font-family: "Microsoft YaHei", "微软雅黑", "Microsoft YaHei UI", sans-serif !important;
+    }
+    body, button, input, select, textarea, table, th, td, code, pre, span, div, p, h1, h2, h3, h4, li, a, svg, svg text, svg tspan {
+        font-family: "Microsoft YaHei", "微软雅黑", "Microsoft YaHei UI", sans-serif !important;
+    }
+    body {
+        background-color: var(--bg);
+        color: var(--text-main);
+        padding: 20px;
+        line-height: 1.6;
+        max-width: 1420px;
+        margin: 0 auto;
+    }
+
+    /* 顶部主横幅（沿用模板风格） */
+    .header-banner {
+        background: linear-gradient(135deg, #0f2240 0%, #1e3a8a 100%);
+        color: white;
+        padding: 20px 28px;
+        border-radius: 12px;
+        margin-bottom: 18px;
+        box-shadow: 0 4px 12px rgba(15, 34, 64, 0.15);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .header-title h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; letter-spacing: 0.3px; }
+    .header-title p { font-size: 13px; opacity: 0.92; }
+
+    .nav-controls { display: flex; align-items: center; gap: 12px; }
+    .nav-btn {
+        background: rgba(255, 255, 255, 0.15);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 8px 16px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        user-select: none;
+    }
+    .nav-btn:hover:not(:disabled) { background: white; color: var(--primary); }
+    .nav-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+    .slide-counter { font-size: 14px; font-weight: 700; color: #93c5fd; min-width: 64px; text-align: center; }
+
+    /* 8大模块导航标签栏 */
+    .nav-tabs {
+        display: flex;
+        gap: 8px;
+        overflow-x: auto;
+        padding-bottom: 8px;
+        margin-bottom: 20px;
+        border-bottom: 2px solid var(--border);
+        scrollbar-width: thin;
+    }
+    .tab-btn {
+        background: #ffffff;
+        border: 1px solid var(--border);
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        color: var(--text-muted);
+        white-space: nowrap;
+        flex-shrink: 0;
+    }
+    .tab-btn:hover { color: var(--secondary); border-color: var(--secondary); background: #f0f7ff; }
+    .tab-btn.active { background: var(--secondary); color: white; border-color: var(--secondary); box-shadow: 0 2px 6px rgba(0, 102, 204, 0.3); }
+    .tab-btn.tab-primary-highlight { border-color: #0066cc; color: #0066cc; font-weight: 700; background: #eff6ff; }
+    .tab-btn.tab-primary-highlight.active { background: #0066cc; color: white; }
+    .tab-btn.tab-highlight { border-color: #10b981; color: #047857; background: #ecfdf5; font-weight: 700; }
+    .tab-btn.tab-highlight.active { background: #10b981; color: white; border-color: #10b981; }
+
+    /* 幻灯片主卡片 */
+    .slide-card {
+        background: var(--card-bg);
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        padding: 24px;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        display: none;
+        opacity: 0;
+        transition: opacity 0.25s ease-in-out;
+    }
+    .slide-card.active { display: block; opacity: 1; }
+
+    .slide-header { border-bottom: 2px solid #f1f5f9; padding-bottom: 14px; margin-bottom: 18px; }
+    .badge {
+        display: inline-block;
+        background: #e0f2fe;
+        color: #0284c7;
+        font-weight: 700;
+        padding: 3px 10px;
+        border-radius: 20px;
+        font-size: 12px;
+        margin-bottom: 6px;
+    }
+    .badge-primary { background: #dbeafe; color: #1d4ed8; }
+    .badge-highlight { background: #dcfce7; color: #15803d; }
+    .badge-warning { background: #fef3c7; color: #b45309; }
+    .badge-danger { background: #fee2e2; color: #b91c1c; }
+    .slide-title { font-size: 20px; font-weight: 700; color: var(--primary); }
+    .slide-subtitle { font-size: 13px; color: var(--text-muted); margin-top: 3px; }
+
+    /* 一句话定位高亮横幅 */
+    .positioning-box {
+        background: linear-gradient(90deg, #eff6ff 0%, #f0fdf4 100%);
+        border: 1px solid #93c5fd;
+        border-left: 5px solid #0066cc;
+        border-radius: 8px;
+        padding: 14px 18px;
+        margin-bottom: 18px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .positioning-text { font-size: 15px; font-weight: 700; color: #0f2240; line-height: 1.55; flex: 1; min-width: 300px; }
+    .positioning-label {
+        display: inline-block;
+        background: #0066cc;
+        color: #ffffff;
+        font-size: 12px;
+        font-weight: 700;
+        padding: 2px 8px;
+        border-radius: 4px;
+        margin-right: 8px;
+        vertical-align: middle;
+    }
+    .kpi-strip { display: flex; gap: 8px; flex-wrap: wrap; }
+    .kpi-pill {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 6px;
+        padding: 6px 12px;
+        text-align: center;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+    }
+    .kpi-pill .kpi-num { font-size: 15px; font-weight: 700; color: #0066cc; display: block; line-height: 1.2; }
+    .kpi-pill .kpi-lbl { font-size: 11px; color: #64748b; }
+
+    /* 网格与面板 */
+    .content-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    .content-grid-wide-left { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 20px; }
+    .content-vertical { display: flex; flex-direction: column; gap: 18px; }
+    @media (max-width: 1024px) {
+        .content-grid, .content-grid-wide-left { grid-template-columns: 1fr; }
+    }
+
+    .panel { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 18px; }
+    .panel-white { background: #ffffff; }
+    .panel-title {
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--primary);
+        margin-bottom: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 6px;
+        border-bottom: 1px solid #cbd5e1;
+        padding-bottom: 8px;
+    }
+
+    .bullet-list { list-style: none; }
+    .bullet-list li {
+        margin-bottom: 10px;
+        position: relative;
+        padding-left: 18px;
+        font-size: 13px;
+        line-height: 1.65;
+    }
+    .bullet-list li:last-child { margin-bottom: 0; }
+    .bullet-list li::before {
+        content: "•";
+        color: var(--secondary);
+        font-weight: bold;
+        font-size: 18px;
+        position: absolute;
+        left: 0;
+        top: -2px;
+    }
+    .bullet-list ul { list-style: none; margin-top: 6px; }
+    .bullet-list ul li { margin-bottom: 6px; font-size: 12.5px; color: #334155; }
+    .bullet-list ul li::before { content: "▪"; color: #0284c7; font-size: 13px; top: 0; }
+
+    /* 徽章与标签 */
+    .metric-badge { display: inline-block; background: #e0f2fe; color: #0369a1; padding: 1px 7px; border-radius: 4px; font-weight: 700; font-size: 11.5px; }
+    .metric-highlight { display: inline-block; background: #dcfce7; color: #15803d; padding: 2px 8px; border-radius: 4px; font-weight: 700; font-size: 12px; border: 1px solid #86efac; }
+    .tag-amber { display: inline-block; background: #fef3c7; color: #92400e; padding: 1px 7px; border-radius: 4px; font-weight: 700; font-size: 11.5px; border: 1px solid #fcd34d; }
+    .tag-danger { display: inline-block; background: #fee2e2; color: #b91c1c; padding: 1px 7px; border-radius: 4px; font-weight: 700; font-size: 11.5px; border: 1px solid #fca5a5; }
+    .tag-new { display: inline-block; background: #dcfce7; color: #15803d; padding: 1px 7px; border-radius: 4px; font-size: 11.5px; font-weight: 700; border: 1px solid #86efac; }
+    .subdomain-tag { display: inline-block; background: #f1f5f9; color: #1e293b; padding: 1px 7px; border-radius: 4px; font-size: 11.5px; font-weight: 700; border: 1px solid #cbd5e1; }
+
+    /* 标杆客户墙 */
+    .client-wall { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+    .client-chip {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #0f2240;
+        padding: 3px 10px;
+        border-radius: 16px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    .client-chip.vip { background: #eff6ff; border-color: #93c5fd; color: #1e40af; }
+
+    /* SVG 容器 */
+    .svg-container {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        border-radius: 8px;
+        padding: 12px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 280px;
+        overflow-x: auto;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+    }
+
+    /* 表格样式 */
+    .sub-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 12.5px; background: #ffffff; }
+    .sub-table th, .sub-table td { border: 1px solid #cbd5e1; padding: 8px 10px; text-align: left; line-height: 1.55; vertical-align: top; }
+    .sub-table th { background: #f1f5f9; font-weight: 700; color: #0f2240; white-space: nowrap; }
+    .sub-table tbody tr:nth-child(even) { background: #f8fafc; }
+    .sub-table tbody tr:hover { background: #f0f7ff; }
+
+    .ba-head { font-size: 14px; font-weight: 700; padding: 8px 14px; border-radius: 6px 6px 0 0; color: #fff; display: flex; justify-content: space-between; align-items: center; }
+    .ba-core { background: #166534; }
+    .ba-exam { background: #1e40af; }
+    .ba-amber { background: #b45309; }
+    .ba-table { margin-top: 0; }
+
+    /* 第3页子场景切换栏 */
+    .scenario-bar {
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        background: #f1f5f9;
+        padding: 8px;
+        border-radius: 8px;
+        border: 1px solid #cbd5e1;
+    }
+    .scenario-btn {
+        background: #ffffff;
+        border: 1px solid #cbd5e1;
+        color: #334155;
+        padding: 8px 14px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 700;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .scenario-btn:hover { border-color: #0066cc; color: #0066cc; }
+    .scenario-btn.active { background: #0f2240; color: #ffffff; border-color: #0f2240; box-shadow: 0 2px 6px rgba(15, 34, 64, 0.2); }
+    .scenario-pane { display: none; }
+    .scenario-pane.active { display: block; }
+
+    /* 评估结论大卡（第7页） */
+    .eval-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 18px; }
+    @media (max-width: 768px) { .eval-cards { grid-template-columns: 1fr; } }
+    .eval-card {
+        border-radius: 8px;
+        padding: 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        border: 1px solid;
+    }
+    .eval-card.high { background: #fef2f2; border-color: #fca5a5; }
+    .eval-card.many { background: #fffbeb; border-color: #fcd34d; }
+    .eval-level {
+        width: 58px;
+        height: 58px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        font-weight: 700;
+        flex-shrink: 0;
+        color: #ffffff;
+    }
+    .eval-card.high .eval-level { background: #dc2626; }
+    .eval-card.many .eval-level { background: #d97706; }
+    .eval-info h3 { font-size: 15px; font-weight: 700; color: #0f2240; margin-bottom: 3px; }
+    .eval-info p { font-size: 13px; color: #334155; line-height: 1.5; }
+
+    /* 复制按钮与链接（第8页） */
+    .copy-btn {
+        background: #eff6ff;
+        color: #0066cc;
+        border: 1px solid #93c5fd;
+        padding: 2px 8px;
+        border-radius: 4px;
+        font-size: 11.5px;
+        font-weight: 700;
+        cursor: pointer;
+        margin-left: 6px;
+        transition: all 0.15s;
+    }
+    .copy-btn:hover { background: #0066cc; color: #ffffff; }
+    .copy-btn.copied { background: #16a34a; color: #ffffff; border-color: #16a34a; }
+    .env-link { color: #0066cc; text-decoration: none; font-weight: 600; word-break: break-all; }
+    .env-link:hover { text-decoration: underline; }
+
+    /* 页脚翻页 */
+    .footer-nav {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 10px;
+        padding: 12px 0;
+        border-top: 1px solid var(--border);
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+    .footer-btn {
+        background: var(--primary);
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 6px;
+        font-size: 13px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .footer-btn:hover:not(:disabled) { background: var(--secondary); }
+    .footer-btn:disabled { background: #cbd5e1; cursor: not-allowed; }
+</style>
+</head>
+<body>
+
+<!-- 全局共享 SVG 箭头定义（避免隐藏页 display:none 导致跨页 marker 失效） -->
+<svg style="position:absolute; width:0; height:0; overflow:hidden;" aria-hidden="true">
+    <defs>
+        <marker id="arr-blue" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#0066cc"/>
+        </marker>
+        <marker id="arr-slate" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#64748b"/>
+        </marker>
+        <marker id="arr-green" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#16a34a"/>
+        </marker>
+        <marker id="arr-amber" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#d97706"/>
+        </marker>
+        <marker id="arr-red" viewBox="0 0 10 10" refX="7" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M 0 0 L 10 5 L 0 10 z" fill="#dc2626"/>
+        </marker>
+    </defs>
+</svg>
+
+<!-- 顶部横幅 -->
+<div class="header-banner">
+    <div class="header-title">
+        <h1>企业体检福利平台（HMSC）系统全景汇报</h1>
+        <p>招商信诺 B 端企业团检与 C 端个险/散客一站式体检与福利履约平台 ｜ 8 大核心模块完整梳理</p>
+    </div>
+    <div class="nav-controls">
+        <button class="nav-btn" id="prevBtn" onclick="prevSlide()">◀ 上一页</button>
+        <span class="slide-counter" id="slideCounter">1 / 8</span>
+        <button class="nav-btn" id="nextBtn" onclick="nextSlide()">下一页 ▶</button>
+    </div>
+</div>
+
+<!-- 8大模块导航栏 -->
+<div class="nav-tabs" id="navTabs">
+    <button class="tab-btn tab-primary-highlight active" data-slide="1" onclick="showSlide(1)">1. 系统一句话概述</button>
+    <button class="tab-btn" data-slide="2" onclick="showSlide(2)">2. 系统主要功能清单</button>
+    <button class="tab-btn tab-highlight" data-slide="3" onclick="showSlide(3)">⭐ 3. 复杂业务场景与流程图</button>
+    <button class="tab-btn" data-slide="4" onclick="showSlide(4)">4. 系统页面入口渠道</button>
+    <button class="tab-btn" data-slide="5" onclick="showSlide(5)">5. 系统接口情况</button>
+    <button class="tab-btn" data-slide="6" onclick="showSlide(6)">6. 下游获取数据情况</button>
+    <button class="tab-btn" data-slide="7" onclick="showSlide(7)">7. 改动频率与运维情况</button>
+    <button class="tab-btn" data-slide="8" onclick="showSlide(8)">8. 系统演示与测试账号</button>
+</div>
+
+<!-- =========================================================
+     模块 01：系统一句话简单概述（PPT 第 1 页）
+     ========================================================= -->
+<div class="slide-card active" id="slide1">
+    <div class="slide-header">
+        <div class="badge badge-primary">模块 01 · PPT 第 1 页</div>
+        <div class="slide-title">一、系统一句话简单概述</div>
+        <div class="slide-subtitle">系统核心定位 · 业务布局与三端核心价值 · 20+ 头部标杆企业客户履约实践</div>
+    </div>
+
+    <div class="positioning-box">
+        <div class="positioning-text">
+            <span class="positioning-label">一句话定位</span>
+            招商信诺面向 B 端企业团检与 C 端个险/散客的一站式体检与福利履约平台，打通检前预约、检中履约、检后解读及报销直赔全闭环。
+        </div>
+        <div class="kpi-strip">
+            <div class="kpi-pill"><span class="kpi-num">20+ 家</span><span class="kpi-lbl">头部标杆企业客户</span></div>
+            <div class="kpi-pill"><span class="kpi-num">17+ 连锁</span><span class="kpi-lbl">民营直连 + 公立协同</span></div>
+            <div class="kpi-pill"><span class="kpi-num">4 + 4</span><span class="kpi-lbl">核心主干 + 外围配套</span></div>
+            <div class="kpi-pill"><span class="kpi-num">全闭环</span><span class="kpi-lbl">检前·检中·检后·报销直赔</span></div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="panel">
+            <div class="panel-title">
+                <span>📌 平台构成与三端核心价值</span>
+                <span class="metric-badge">移动端 + PC 端全覆盖</span>
+            </div>
+            <ul class="bullet-list">
+                <li><b>业务布局：</b>覆盖移动端与 PC 端，以<b>企业体检（员工/入职）、家属体检、常规报销、积分报销</b>为核心主干，配套<b>健康商城（非体检服务）、HRA 健康测评、电子健康档案（EHR）及 MIS 运营后台</b>。</li>
+                <li><b>对企业大客户（B 端）：</b>支持多租户独立皮肤/主题与中英双语（英文版）定制，灵活承载年度团检统付、福利积分发放、外院发票报销、商保直赔、企业对账单及 HR 异常指标监控。</li>
+                <li><b>对员工与家属（C 端）：</b>多渠道无缝触达（公众号 / APP / 小程序 / PC / 大客户免密），享受全国 <span class="metric-badge">17+ 民营体检连锁</span> 实时预约与公立医院协同履约，以及家属积分共济、AI 报告解读与家庭报告聚合查看。</li>
+                <li><b>对内部运营与合规：</b>通过统一网关（<span class="subdomain-tag">RSA 加密 + JWT 鉴权</span>）、字段级数据脱敏与 DLP 敏感操作审计，保障个人健康信息（PHI）与资金结算合规可控。</li>
+                <li><b>服务 20+ 头部标杆企业客户：</b>
+                    <div class="client-wall">
+                        <span class="client-chip vip">招商银行总行</span>
+                        <span class="client-chip vip">西门子（中国/医疗/能源）</span>
+                        <span class="client-chip vip">特斯拉</span>
+                        <span class="client-chip vip">诺华</span>
+                        <span class="client-chip">惠普</span>
+                        <span class="client-chip">爱马仕</span>
+                        <span class="client-chip">花旗</span>
+                        <span class="client-chip">蒙牛</span>
+                        <span class="client-chip">费列罗</span>
+                        <span class="client-chip">嘉士伯</span>
+                        <span class="client-chip">三井住友银行</span>
+                        <span class="client-chip">东方证券</span>
+                        <span class="client-chip">华泰联合证券</span>
+                        <span class="client-chip">招商基金</span>
+                        <span class="client-chip">招商财富</span>
+                        <span class="client-chip">普利司通</span>
+                        <span class="client-chip">汉高</span>
+                        <span class="client-chip">利洁时 等</span>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <span>📐 【企业体检福利平台（HMSC）业务全景与价值闭环图】</span>
+                <span class="tag-new">2B2C 全链路</span>
+            </div>
+            <div class="svg-container">
+                <svg width="100%" height="100%" viewBox="0 0 540 430" style="max-width: 100%; display: block;">
+                    <!-- 顶层定位栏 -->
+                    <rect x="15" y="10" width="510" height="40" rx="8" fill="#0f2240"/>
+                    <text x="270" y="35" font-size="13" font-weight="bold" fill="#ffffff" text-anchor="middle">企业体检福利平台（HMSC）· 一站式体检与福利履约底座</text>
+
+                    <!-- 多端入口条 -->
+                    <rect x="15" y="60" width="510" height="34" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+                    <text x="270" y="81" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">多渠道无缝触达：PC 门户 · 移动 H5 · 公众号 / 小程序 / APP · 大客户免密接入</text>
+
+                    <line x1="270" y1="94" x2="270" y2="112" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                    <!-- 四阶段履约全闭环 -->
+                    <rect x="15" y="114" width="116" height="52" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+                    <text x="73" y="135" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">① 检前预约</text>
+                    <text x="73" y="153" font-size="9.5" fill="#0284c7" text-anchor="middle">赋权·选检·双向预约</text>
+
+                    <line x1="131" y1="140" x2="144" y2="140" stroke="#0066cc" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+                    <rect x="146" y="114" width="116" height="52" rx="6" fill="#e0f2fe" stroke="#0284c7" stroke-width="1.5"/>
+                    <text x="204" y="135" font-size="11" font-weight="bold" fill="#0369a1" text-anchor="middle">② 检中履约</text>
+                    <text x="204" y="153" font-size="9.5" fill="#0284c7" text-anchor="middle">17+民营直连/公立协同</text>
+
+                    <line x1="262" y1="140" x2="275" y2="140" stroke="#0066cc" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+                    <rect x="277" y="114" width="116" height="52" rx="6" fill="#dcfce7" stroke="#16a34a" stroke-width="1.5"/>
+                    <text x="335" y="135" font-size="11" font-weight="bold" fill="#15803d" text-anchor="middle">③ 检后解读</text>
+                    <text x="335" y="153" font-size="9.5" fill="#16a34a" text-anchor="middle">OCR归档·AI/医生解读</text>
+
+                    <line x1="393" y1="140" x2="406" y2="140" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arr-green)"/>
+
+                    <rect x="408" y="114" width="117" height="52" rx="6" fill="#fef3c7" stroke="#d97706" stroke-width="1.5"/>
+                    <text x="466" y="135" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">④ 报销与直赔</text>
+                    <text x="466" y="153" font-size="9.5" fill="#d97706" text-anchor="middle">常规/积分/211商保直赔</text>
+
+                    <!-- 核心业务主干 + 外围配套 -->
+                    <rect x="15" y="180" width="510" height="128" rx="8" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
+                    <text x="270" y="200" font-size="11.5" font-weight="bold" fill="#0f2240" text-anchor="middle">核心业务主干（4大主模块 + 商保直赔） &amp; 外围配套支撑（4大模块）</text>
+                    <line x1="25" y1="207" x2="515" y2="207" stroke="#e2e8f0" stroke-width="1"/>
+
+                    <!-- 主干行 -->
+                    <rect x="24" y="215" width="93" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6"/>
+                    <text x="70" y="232" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">企业体检</text>
+                    <text x="70" y="246" font-size="8.5" fill="#3b82f6" text-anchor="middle">员工 / 入职体检</text>
+
+                    <rect x="123" y="215" width="93" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6"/>
+                    <text x="169" y="232" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">家属体检</text>
+                    <text x="169" y="246" font-size="8.5" fill="#3b82f6" text-anchor="middle">1:1 积分共济</text>
+
+                    <rect x="222" y="215" width="93" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6"/>
+                    <text x="268" y="232" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">常规报销</text>
+                    <text x="268" y="246" font-size="8.5" fill="#3b82f6" text-anchor="middle">体检/复检/疫苗</text>
+
+                    <rect x="321" y="215" width="93" height="38" rx="5" fill="#eff6ff" stroke="#3b82f6"/>
+                    <text x="367" y="232" font-size="10" font-weight="bold" fill="#1e40af" text-anchor="middle">积分报销</text>
+                    <text x="367" y="246" font-size="8.5" fill="#3b82f6" text-anchor="middle">5类健康消费发票</text>
+
+                    <rect x="420" y="215" width="96" height="38" rx="5" fill="#fef3c7" stroke="#d97706"/>
+                    <text x="468" y="232" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle">商保直赔</text>
+                    <text x="468" y="246" font-size="8.5" fill="#d97706" text-anchor="middle">团单EWP/个险SWP</text>
+
+                    <!-- 配套行 -->
+                    <rect x="24" y="261" width="117" height="36" rx="5" fill="#f0fdf4" stroke="#16a34a"/>
+                    <text x="82" y="277" font-size="9.5" font-weight="bold" fill="#166534" text-anchor="middle">健康商城</text>
+                    <text x="82" y="290" font-size="8.5" fill="#15803d" text-anchor="middle">体检卡券/实物/开票</text>
+
+                    <rect x="148" y="261" width="117" height="36" rx="5" fill="#f0fdf4" stroke="#16a34a"/>
+                    <text x="206" y="277" font-size="9.5" font-weight="bold" fill="#166534" text-anchor="middle">HRA 健康测评</text>
+                    <text x="206" y="290" font-size="8.5" fill="#15803d" text-anchor="middle">Drools规则推荐加项</text>
+
+                    <rect x="272" y="261" width="117" height="36" rx="5" fill="#f0fdf4" stroke="#16a34a"/>
+                    <text x="330" y="277" font-size="9.5" font-weight="bold" fill="#166534" text-anchor="middle">电子健康档案 EHR</text>
+                    <text x="330" y="290" font-size="8.5" fill="#15803d" text-anchor="middle">历年归档与趋势对比</text>
+
+                    <rect x="396" y="261" width="120" height="36" rx="5" fill="#f0fdf4" stroke="#16a34a"/>
+                    <text x="456" y="277" font-size="9.5" font-weight="bold" fill="#166534" text-anchor="middle">MIS 运营后台</text>
+                    <text x="456" y="290" font-size="8.5" fill="#15803d" text-anchor="middle">20个标准运营模块</text>
+
+                    <!-- 三端核心价值底座 -->
+                    <rect x="15" y="322" width="162" height="96" rx="6" fill="#eff6ff" stroke="#2563eb" stroke-width="1.5"/>
+                    <text x="96" y="342" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">B 端 · 企业大客户</text>
+                    <text x="96" y="360" font-size="9" fill="#334155" text-anchor="middle">多租户换肤 &amp; 中英双语定制</text>
+                    <text x="96" y="376" font-size="9" fill="#334155" text-anchor="middle">团检统付 / 积分 / 外院报销</text>
+                    <text x="96" y="392" font-size="9" fill="#334155" text-anchor="middle">商保直赔 / 对账单 / HR看板</text>
+                    <text x="96" y="408" font-size="8.5" font-weight="bold" fill="#0066cc" text-anchor="middle">服务 20+ 头部标杆名企</text>
+
+                    <rect x="189" y="322" width="162" height="96" rx="6" fill="#ecfdf5" stroke="#10b981" stroke-width="1.5"/>
+                    <text x="270" y="342" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">C 端 · 员工与家属</text>
+                    <text x="270" y="360" font-size="9" fill="#334155" text-anchor="middle">全渠道免密无缝触达</text>
+                    <text x="270" y="376" font-size="9" fill="#334155" text-anchor="middle">17+民营实时锁单 + 公立协同</text>
+                    <text x="270" y="392" font-size="9" fill="#334155" text-anchor="middle">1:1 家属积分共济 &amp; 家庭报告</text>
+                    <text x="270" y="408" font-size="8.5" font-weight="bold" fill="#047857" text-anchor="middle">小诺健康 AI + 专科医生解读</text>
+
+                    <rect x="363" y="322" width="162" height="96" rx="6" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.5"/>
+                    <text x="444" y="342" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">内部运营与安全合规</text>
+                    <text x="444" y="360" font-size="9" fill="#334155" text-anchor="middle">统一网关 RSA加密 + JWT鉴权</text>
+                    <text x="444" y="376" font-size="9" fill="#334155" text-anchor="middle">字段级敏感数据动态脱敏</text>
+                    <text x="444" y="392" font-size="9" fill="#334155" text-anchor="middle">DLP 敏感操作全留痕审计</text>
+                    <text x="444" y="408" font-size="8.5" font-weight="bold" fill="#b45309" text-anchor="middle">PHI 健康信息与资金合规可控</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     模块 02：系统主要功能清单（PPT 第 2 页）
+     ========================================================= -->
+<div class="slide-card" id="slide2">
+    <div class="slide-header">
+        <div class="badge badge-primary">模块 02 · PPT 第 2 页</div>
+        <div class="slide-title">二、系统主要功能清单</div>
+        <div class="slide-subtitle">按「核心主模块（体检服务与报销核心）」与「外围配套能力（非体检服务与运营支撑）」双层架构完整呈现</div>
+    </div>
+
+    <div class="content-vertical">
+        <!-- 1. 核心主模块 -->
+        <div class="panel panel-white">
+            <div class="ba-head ba-exam">
+                <span>🩺 1. 核心主模块（体检服务与报销核心 · 5 大模块）</span>
+                <span style="font-size: 12px; opacity: 0.9;">检前 - 检中 - 检后 - 报销/直赔核心主干</span>
+            </div>
+            <table class="sub-table ba-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">业务模块</th>
+                        <th style="width: 38%;">核心功能点</th>
+                        <th style="width: 47%;">关键业务能力亮点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>企业体检</b><br/><span class="metric-badge">核心主干</span></td>
+                        <td>员工体检、<b>入职体检</b>、优惠套餐、加项选购、<b>体检卡激活</b>、<b>套餐对比/推荐</b>、体检预约（改期/取消）、<b>体检提醒</b>、体检报告、<b>小诺健康 AI 解读</b>、<b>检后管理</b>、<b>专属客服</b>、<b>英文版</b></td>
+                        <td>覆盖检前-检中-检后全流程；支持线上 <b>17+ 民营连锁直连锁单 + 线下公立医院人工协调</b>双轨履约；具备<b>中英双语</b>能力服务外企客户，支持性别/婚否适检门禁、权益到期拦截、项目屏蔽日、<b>小诺健康 AI（报告解读/心理咨询多 Agent）</b>及三方专科医生异步解读（C24/C59）</td>
+                    </tr>
+                    <tr>
+                        <td><b>家属体检</b><br/><span class="metric-badge">积分共济</span></td>
+                        <td>家属产品包（G）专属选购、家属信息维护、多持有人购物车合并下单、<b>积分+现金</b>组合结算、家属体检预约、家庭报告聚合查阅</td>
+                        <td>企业不统付，支持员工全额自费或直接划扣本人福利积分（<b>1:1 家属积分共济</b>）购买；员工主账号一键切换查看本人及家属体检报告</td>
+                    </tr>
+                    <tr>
+                        <td><b>常规报销</b><br/><span class="metric-badge">事后垫资报销</span></td>
+                        <td><b>体检报销</b>、<b>复检报销</b>、疫苗（如流感疫苗）及大客户定制报销（如 KPMG 等）、发票/附件上传、收款银行卡维护、审核状态追踪</td>
+                        <td>支持员工与家属外院垫资后事后提交发票，完整流转「<b>审核中 → 待付款 → 已付款 / 失败处理</b>」，推送核心财务打款</td>
+                    </tr>
+                    <tr>
+                        <td><b>积分报销</b><br/><span class="metric-badge">福利积分变现</span></td>
+                        <td>福利积分额度校验、外院健康消费发票报销（体检 / 洁牙 / 眼科 / 健身卡 / 疫苗）、收款信息绑定、审核与打款回执追踪</td>
+                        <td>打通福利积分与事后发票报销，<b>积分 1:1 核算审核金额</b>并驱动核心财务打款</td>
+                    </tr>
+                    <tr>
+                        <td><b>商保直赔</b><br/><span class="tag-amber">特殊结算模式</span></td>
+                        <td>B 端团单（EWP）与 C 端散客/个险保单（SWP）理赔标识门禁、身份证正反面 OCR、手写电子签名、理赔申请书 PDF 动态盖章合成、专线 SFTP 归档</td>
+                        <td>同时覆盖 B 端团检与 C 端个险/散客保单赋权场景，实现<b>免垫资、零自付体检</b>，自动归档至 <b>211 保险核心</b>完成理赔结案</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. 外围配套能力 -->
+        <div class="panel panel-white">
+            <div class="ba-head ba-core">
+                <span>🧩 2. 外围配套能力（非体检服务与运营支撑 · 4 大模块）</span>
+                <span style="font-size: 12px; opacity: 0.9;">商城 · 测评 · 档案 · MIS 20个标准运营模块</span>
+            </div>
+            <table class="sub-table ba-table">
+                <thead>
+                    <tr>
+                        <th style="width: 15%;">配套模块</th>
+                        <th style="width: 48%;">核心职责</th>
+                        <th style="width: 37%;">业务联动与边界说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>健康商城</b><br/><span class="subdomain-tag">非体检服务</span></td>
+                        <td>服务商品与实物健康商品在线购买、订单查询/取消、申请退款、服务使用、<b>物流配送</b>、<b>申请开票</b>、项目自定义商品分类</td>
+                        <td>支持体检卡券零售（在体检端经“<b>体检卡激活</b>”生成正式体检权益后即锁死不可退）；实物支持退货退款及回调退积分</td>
+                    </tr>
+                    <tr>
+                        <td><b>HRA 健康测评</b><br/><span class="subdomain-tag">检前联动</span></td>
+                        <td>生活习惯/家族病史问卷（体检测评、综合测评）、<b>Drools 规则引擎</b>计算风险标签、个性化套餐/加项推荐</td>
+                        <td>与企业体检检前环节联动，支持测评结果自动推荐并勾选加项包</td>
+                    </tr>
+                    <tr>
+                        <td><b>电子健康档案（EHR）</b><br/><span class="subdomain-tag">检后归档</span></td>
+                        <td>历年正式体检报告归档查阅、结构化异常指标趋势对比（对接健康档案系统 <b>HMES</b>）</td>
+                        <td>自主上传的外院历史报告<b>物理隔离</b>，不污染官方主档</td>
+                    </tr>
+                    <tr>
+                        <td><b>MIS 运营后台</b><br/><span class="tag-new">20个标准模块</span></td>
+                        <td>
+                            • <b>企业/客户管理</b>：企业管理、客户管理、用户管理、<b>皮肤管理</b>、公告管理、系统配置<br/>
+                            • <b>权益与交易</b>：权益管理、<b>体检权益领取管理</b>、活动管理、商品管理、订单管理、预约单管理<br/>
+                            • <b>财务与报销</b>：<b>发票管理</b>、<b>企业对账单</b>、报销管理、<b>复检报销管理</b><br/>
+                            • <b>报告与数据</b>：体检报告管理、体检测评管理、综合测评管理、<b>报表管理</b>
+                        </td>
+                        <td>覆盖 <b>20 个标准运营模块</b>，支撑大客户上线配置、多租户换肤、线下公立机构人工核销与企业财务对账闭环（另含<b>招行 CMB 专属渠道集成</b>）</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     模块 03：复杂业务处理场景及流程图（PPT 第 3 页）
+     ========================================================= -->
+<div class="slide-card" id="slide3">
+    <div class="slide-header">
+        <div class="badge badge-highlight">⭐ 模块 03 · PPT 第 3 页</div>
+        <div class="slide-title">三、复杂业务处理场景及流程图（精选 3 条核心主干链路）</div>
+        <div class="slide-subtitle">严格对齐领域全景规范与系统集成口径 · 聚焦纯业务语义与核心控制点（支持按子场景独立演示或三图同屏总览）</div>
+    </div>
+
+    <div class="content-vertical">
+        <!-- 子场景切换器 -->
+        <div class="scenario-bar">
+            <button class="scenario-btn active" data-sc="sc1" onclick="showScenario('sc1')">场景 1：企业体检全链路与双轨履约（6阶段闭环）</button>
+            <button class="scenario-btn" data-sc="sc2" onclick="showScenario('sc2')">场景 2：家属体检 + 多平台积分两阶段结算与逆向退费</button>
+            <button class="scenario-btn" data-sc="sc3" onclick="showScenario('sc3')">场景 3：常规报销 &amp; 积分报销审核打款链路</button>
+            <button class="scenario-btn" data-sc="all" onclick="showScenario('all')">📋 三大场景同屏总览</button>
+        </div>
+
+        <!-- ==================== 场景 1 ==================== -->
+        <div class="scenario-pane active" id="sc1">
+            <div class="panel">
+                <div class="panel-title">
+                    <span>🔗 场景 1：企业体检端到端全链路与双轨履约（6 阶段闭环）</span>
+                    <span class="metric-highlight">Benefit ➔ Order（含0元统付单）➔ Appointment</span>
+                </div>
+                <ul class="bullet-list" style="margin-bottom: 14px;">
+                    <li><b>核心模型：</b>单链归属 <span class="subdomain-tag">体检权益(Benefit) ➔ 主订单(Order，含0元统付单) ➔ 预约单(Appointment)</span>；顶层配置 <span class="subdomain-tag">企业项目(Project) ➔ 团单(TeamOrder) ➔ 产品包(P员工/G家属)</span>。</li>
+                    <li><b>核心复杂控制点：</b>4 路权益赋权 + 两道分级合规门禁（选检前商保直赔门禁 vs 预约前年度劳资承诺书）+ 智能选检（大数据推荐服务 TBDS 问卷/报告 AI 推荐与套餐对比）+ 线上 17+ 民营直连 vs 线下公立人工协同双轨 + 5 类履约变更/容灾策略 + 大模型 OCR 归档与双轨解读。</li>
+                </ul>
+                <div class="svg-container" style="min-height: 540px;">
+                    <svg width="100%" height="100%" viewBox="0 0 980 555" style="max-width: 100%; display: block;">
+                        <!-- 第1行：配置赋权 -> 登录隐私 -> 商保直赔门禁 -->
+                        <rect x="16" y="14" width="308" height="78" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="170" y="34" font-size="11.5" font-weight="bold" fill="#1e40af" text-anchor="middle">1. 顶层配置与 4 路权益发放 (Benefit)</text>
+                        <text x="170" y="52" font-size="8.8" fill="#1d4ed8" text-anchor="middle">Project → TeamOrder(1:N) → ProductPackage(P员工/G家属)</text>
+                        <text x="170" y="69" font-size="8.8" fill="#334155" text-anchor="middle">HR批量导入 / ToB免密动态赋权 / 体检卡激活 / 自费优惠购</text>
+
+                        <line x1="324" y1="53" x2="346" y2="53" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="348" y="14" width="182" height="78" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="1.6"/>
+                        <text x="439" y="38" font-size="11.5" font-weight="bold" fill="#0f2240" text-anchor="middle">2. 登录与一级隐私授权</text>
+                        <text x="439" y="58" font-size="9.5" fill="#334155" text-anchor="middle">白名单 / 免密登录</text>
+                        <text x="439" y="74" font-size="9" fill="#64748b" text-anchor="middle">+ 一级隐私授权门禁</text>
+
+                        <line x1="530" y1="53" x2="556" y2="53" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="558" y="14" width="176" height="78" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.8"/>
+                        <text x="646" y="36" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">◇ 开启商保直赔门禁?</text>
+                        <text x="646" y="55" font-size="9.5" fill="#92400e" text-anchor="middle">企业团检 EWP / 散客个险 SWP</text>
+                        <text x="646" y="73" font-size="9" fill="#b45309" text-anchor="middle">否：直接进入智能选检辅助</text>
+
+                        <line x1="734" y1="53" x2="768" y2="53" stroke="#d97706" stroke-width="2" marker-end="url(#arr-amber)"/>
+                        <text x="751" y="45" font-size="9" font-weight="bold" fill="#b45309" text-anchor="middle">是</text>
+
+                        <rect x="770" y="14" width="194" height="78" rx="8" fill="#fff7ed" stroke="#ea580c" stroke-width="1.8"/>
+                        <text x="867" y="35" font-size="11" font-weight="bold" fill="#9a3412" text-anchor="middle">商保直赔前置签署归档</text>
+                        <text x="867" y="54" font-size="9.5" fill="#c2410c" text-anchor="middle">身份证OCR + 手写电子签名</text>
+                        <text x="867" y="72" font-size="9" fill="#334155" text-anchor="middle">合成理赔PDF → 专线SFTP归档211核心</text>
+
+                        <!-- 跨行连线 Row 1 -> Row 2 -->
+                        <path d="M 646 92 L 646 108 L 128 108 L 128 122" fill="none" stroke="#64748b" stroke-width="1.6" marker-end="url(#arr-slate)"/>
+                        <path d="M 867 92 L 867 108 L 646 108" fill="none" stroke="#ea580c" stroke-width="1.6"/>
+                        <text x="625" y="104" font-size="9" fill="#64748b">否 / 归档完成</text>
+
+                        <!-- 第2行：智能选检 -> 双向选购硬校验 -> 确立主订单 -> 二级合规门禁 -->
+                        <rect x="16" y="124" width="224" height="78" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+                        <text x="128" y="145" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">3. 智能选检辅助 (可选·TBDS)</text>
+                        <text x="128" y="164" font-size="9.5" fill="#15803d" text-anchor="middle">问卷 / 历史报告 AI 智能推荐</text>
+                        <text x="128" y="181" font-size="9" fill="#334155" text-anchor="middle">&amp; 标准医学字典套餐对比</text>
+
+                        <line x1="240" y1="163" x2="262" y2="163" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="264" y="124" width="252" height="78" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="390" y="145" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">4. 双向选购 (套餐↔分院) + 硬校验</text>
+                        <text x="390" y="164" font-size="9.5" fill="#1d4ed8" text-anchor="middle">适检门禁 / 互斥与预算帽校验</text>
+                        <text x="390" y="181" font-size="9" fill="#334155" text-anchor="middle">套餐门店交集 / 项目屏蔽日与停业策略</text>
+
+                        <line x1="516" y1="163" x2="538" y2="163" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="540" y="124" width="182" height="78" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="631" y="145" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">5. 确立主订单 (Order)</text>
+                        <text x="631" y="164" font-size="9.5" fill="#334155" text-anchor="middle">0元统付 / 自费积分下单</text>
+                        <text x="631" y="181" font-size="9" fill="#64748b" text-anchor="middle">支持取消重约权益回流</text>
+
+                        <line x1="722" y1="163" x2="744" y2="163" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="746" y="124" width="218" height="78" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.8"/>
+                        <text x="855" y="145" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">◇ 二级合规门禁：劳资承诺书</text>
+                        <text x="855" y="164" font-size="9.5" fill="#92400e" text-anchor="middle">是(未签) → 在线签署承诺书并存证</text>
+                        <text x="855" y="181" font-size="9" fill="#334155" text-anchor="middle">否 / 已签 → 直接放行封装预约单</text>
+
+                        <!-- 跨行连线 Row 2 -> Row 3 -->
+                        <path d="M 855 202 L 855 216 L 120 216 L 120 250" fill="none" stroke="#0066cc" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+                        <!-- 第3行：原子封装预约单 -> 供应商双轨履约 -> 履约变更与容灾 -->
+                        <rect x="16" y="252" width="208" height="86" rx="8" fill="#0f2240"/>
+                        <text x="120" y="278" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">6. 合并原子封装预约单</text>
+                        <text x="120" y="298" font-size="10" fill="#93c5fd" text-anchor="middle">Appointment 唯一履约单</text>
+                        <text x="120" y="317" font-size="9.5" fill="#e2e8f0" text-anchor="middle">主套餐 + 全部加项一站式交付</text>
+
+                        <!-- 双轨分叉线 -->
+                        <path d="M 224 280 L 245 280 L 245 258 L 264 258" fill="none" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+                        <path d="M 224 310 L 245 310 L 245 336 L 264 336" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <rect x="266" y="228" width="336" height="62" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="434" y="250" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">供应商双轨 A · 线上 17+ 民营体检连锁直连</text>
+                        <text x="434" y="271" font-size="9.5" fill="#334155" text-anchor="middle">调机构 API 实时锁单：预约成功(02) / 超时售罄即时落标失败(07)</text>
+
+                        <rect x="266" y="302" width="336" height="72" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.8"/>
+                        <text x="434" y="323" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">供应商双轨 B · 线下公立 / 特批协调 / 团检报名(0030)</text>
+                        <text x="434" y="342" font-size="9.5" fill="#15803d" text-anchor="middle">团检专属门店过滤 + 落标 groupCheck(Y/N)</text>
+                        <text x="434" y="359" font-size="9" fill="#334155" text-anchor="middle">生成申请单 → 导出 Excel → 客服人工协调机构确认</text>
+
+                        <!-- 虚线指向履约前变更/容灾 -->
+                        <line x1="602" y1="258" x2="636" y2="258" stroke="#d97706" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arr-amber)"/>
+                        <line x1="602" y1="336" x2="636" y2="336" stroke="#d97706" stroke-width="1.8" stroke-dasharray="4,3" marker-end="url(#arr-amber)"/>
+
+                        <rect x="638" y="228" width="326" height="146" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.8" stroke-dasharray="5,3"/>
+                        <text x="801" y="250" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">⚡ 履约前变更与 5 类容灾策略（虚线旁路保障）</text>
+                        <line x1="650" y1="258" x2="952" y2="258" stroke="#fde68a"/>
+                        <text x="652" y="278" font-size="9.5" fill="#334155">• 同店改期（线下预约自动刷新 groupCheck 标识）</text>
+                        <text x="652" y="298" font-size="9.5" fill="#334155">• 体检当日禁取消门禁 / 权益过期自动熔断拦截</text>
+                        <text x="652" y="318" font-size="9.5" fill="#334155">• 分院临时停业触发降级协调改约兜底</text>
+                        <text x="652" y="338" font-size="9.5" fill="#334155">• 超期未到检自动释放排期容量与权益回流</text>
+                        <text x="652" y="358" font-size="9" font-weight="bold" fill="#b45309">• 全程保障 C 端预约状态与机构侧库存最终一致</text>
+
+                        <!-- 跨行连线 Row 3 -> Row 4 -->
+                        <path d="M 434 374 L 434 388 L 130 388 L 130 402" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <!-- 第4行：双轨到检同步 -> 大模型OCR归档 -> 报告增值与智能服务闭环 -->
+                        <rect x="16" y="404" width="228" height="136" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="130" y="426" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">7. 双轨到检同步 (已到检 04)</text>
+                        <line x1="26" y1="434" x2="234" y2="434" stroke="#bfdbfe"/>
+                        <text x="26" y="456" font-size="9" fill="#334155">• 线上定时轮询 / 线下MIS核销</text>
+                        <text x="26" y="480" font-size="9" fill="#1d4ed8" font-weight="bold">• 确立供应商采购结算里程碑</text>
+                        <text x="26" y="504" font-size="9" fill="#334155">• 触发员工检后服务口碑评价</text>
+
+                        <line x1="244" y1="472" x2="264" y2="472" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="266" y="404" width="228" height="136" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="1.8"/>
+                        <text x="380" y="426" font-size="11" font-weight="bold" fill="#0f2240" text-anchor="middle">8. 大模型 OCR 解析归档 HMES</text>
+                        <line x1="276" y1="434" x2="484" y2="434" stroke="#cbd5e1"/>
+                        <text x="276" y="456" font-size="9" fill="#334155">• 原版PDF报告送大模型OCR解析</text>
+                        <text x="276" y="480" font-size="9" fill="#334155">• 结构化归档健康档案系统(HMES)</text>
+                        <text x="276" y="504" font-size="8.8" font-weight="bold" fill="#b45309">• 外院自传报告物理隔离不入主档</text>
+
+                        <line x1="494" y1="472" x2="514" y2="472" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <rect x="516" y="404" width="448" height="136" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                        <text x="740" y="425" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">9. 检后报告增值与多维智能服务闭环</text>
+                        <line x1="528" y1="433" x2="952" y2="433" stroke="#a7f3d0"/>
+                        <text x="528" y="451" font-size="8.8" fill="#1e293b">① <tspan font-weight="bold" fill="#047857">小诺健康AI：</tspan>国密SM4/SM3多Agent免登(报告解读/心理咨询)</text>
+                        <text x="542" y="467" font-size="8.6" fill="#334155">+ 四要素隐私门禁 + 短效RSA令牌回查团检(EWP)/散客(SWP)报告</text>
+                        <text x="528" y="487" font-size="8.8" fill="#1e293b">② <tspan font-weight="bold" fill="#047857">三方专科医生解读(C24/C59)：</tspan>四条件自动申请 / 手动前置门禁</text>
+                        <text x="542" y="503" font-size="8.6" fill="#334155">(合并自传报告上限 30 份，后续补传不重复扣减次数)</text>
+                        <text x="528" y="523" font-size="8.8" fill="#1e293b">③ <tspan font-weight="bold" fill="#047857">全场景协同：</tspan>保险在线客服(AES-GCM免登) / 家庭报告共用 / HR异常看板</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 场景 2 ==================== -->
+        <div class="scenario-pane" id="sc2">
+            <div class="panel">
+                <div class="panel-title">
+                    <span>💳 场景 2：家属体检 + 多平台积分两阶段结算与逆向退费</span>
+                    <span class="metric-highlight">双边镜像账本防超扣 · 退款回调驱动退积分</span>
+                </div>
+                <ul class="bullet-list" style="margin-bottom: 14px;">
+                    <li><b>核心复杂控制点：</b>承接多持有人（员工升级/加项 + 家属产品包 G）合并结算、1:1 积分按法定优先级落标子订单、外部积分平台（<b>核心积分 / 福粒 / 薪福通</b>）“两阶段冻结转实扣 + 双边镜像账本防超扣 + SKU 级穿透”，以及“前置级联取消预约 + 资金退款异步回调驱动退积分”的事务一致性。</li>
+                </ul>
+                <div class="svg-container" style="min-height: 410px;">
+                    <svg width="100%" height="100%" viewBox="0 0 980 415" style="max-width: 100%; display: block;">
+                        <!-- 第1行：正向加车 -> 组合单15分钟占容 -> 1:1优先级分摊 -> 阶段1双边预冻结 -->
+                        <rect x="16" y="16" width="212" height="78" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="122" y="38" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">1. 多持有人选品加车 (CartItem)</text>
+                        <text x="122" y="57" font-size="9.5" fill="#334155" text-anchor="middle">员工升级/加项 + 家属产品包(G)</text>
+                        <text x="122" y="75" font-size="9" fill="#64748b" text-anchor="middle">(草稿阶段不占排期容额)</text>
+
+                        <line x1="228" y1="55" x2="250" y2="55" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="252" y="16" width="224" height="78" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="364" y="38" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">2. 瞬态组合订单 (CombinationOrder)</text>
+                        <text x="364" y="57" font-size="9.5" fill="#1d4ed8" text-anchor="middle">按 1单 = 1持有人 自动拆单</text>
+                        <text x="364" y="75" font-size="9" fill="#334155" text-anchor="middle">+ 分院排期临时占容 15 分钟</text>
+
+                        <line x1="476" y1="55" x2="498" y2="55" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="500" y="16" width="224" height="78" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.8"/>
+                        <text x="612" y="38" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">3. 积分 1:1 优先级分摊 (SubOrder)</text>
+                        <text x="612" y="57" font-size="9.5" fill="#15803d" text-anchor="middle">① 先抵主干套餐升级/加价差额</text>
+                        <text x="612" y="75" font-size="9.5" fill="#15803d" text-anchor="middle">② 再抵自选加项包 / 家属包积分共济</text>
+
+                        <line x1="724" y1="55" x2="746" y2="55" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <rect x="748" y="16" width="216" height="78" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.8"/>
+                        <text x="856" y="38" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">4. 两阶段结算-阶段1：双边预冻结</text>
+                        <text x="856" y="57" font-size="9.2" fill="#92400e" text-anchor="middle">福粒/薪福通SKU级扣减 + 核心镜像账本</text>
+                        <text x="856" y="75" font-size="9" fill="#334155" text-anchor="middle">(接口超时自动查单确认终态)</text>
+
+                        <!-- D -> E 连线 -->
+                        <path d="M 856 94 L 856 112 L 642 112 L 642 130" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#arr-amber)"/>
+
+                        <!-- 第2行：超时解冻 <- 收银台 <- 是否补现金 -> 阶段2转实扣 -->
+                        <rect x="16" y="132" width="248" height="80" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.8"/>
+                        <text x="140" y="154" font-size="11" font-weight="bold" fill="#991b1b" text-anchor="middle">15分钟超时未付 / 主动取消</text>
+                        <text x="140" y="173" font-size="9.5" fill="#dc2626" text-anchor="middle">定时任务自动取消组合订单</text>
+                        <text x="140" y="191" font-size="9" fill="#334155" text-anchor="middle">释放15分钟占容 + 并发解冻双边积分</text>
+
+                        <line x1="302" y1="172" x2="266" y2="172" stroke="#dc2626" stroke-width="2" marker-end="url(#arr-red)"/>
+                        <text x="284" y="164" font-size="8.5" fill="#dc2626" text-anchor="middle">超时</text>
+
+                        <rect x="304" y="132" width="222" height="80" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="415" y="154" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">调起招行 / EPAY 收银台支付</text>
+                        <text x="415" y="173" font-size="9.5" fill="#334155" text-anchor="middle">在线支付个人现金自付差额</text>
+                        <text x="415" y="191" font-size="9" fill="#0066cc" text-anchor="middle">等待收银台支付成功异步回调</text>
+
+                        <line x1="564" y1="172" x2="528" y2="172" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+                        <text x="546" y="164" font-size="8.5" fill="#0066cc" text-anchor="middle">补差额</text>
+
+                        <rect x="566" y="132" width="152" height="80" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.8"/>
+                        <text x="642" y="156" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">◇ 是否需补现金?</text>
+                        <text x="642" y="176" font-size="9" fill="#92400e" text-anchor="middle">需自付差额 ➔ 左</text>
+                        <text x="642" y="193" font-size="9" fill="#15803d" text-anchor="middle">纯积分全额抵扣 ➔ 右</text>
+
+                        <line x1="718" y1="172" x2="754" y2="172" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+                        <text x="736" y="164" font-size="8.5" fill="#15803d" text-anchor="middle">纯积分</text>
+
+                        <rect x="756" y="132" width="208" height="80" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                        <text x="860" y="154" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">5. 阶段2：转实扣 &amp; 拆独立主单</text>
+                        <text x="860" y="173" font-size="9.5" fill="#047857" text-anchor="middle">积分正式转实扣 + 清理购物车</text>
+                        <text x="860" y="191" font-size="9" fill="#334155" text-anchor="middle">组合单解体为各自独立主订单(Order)</text>
+
+                        <!-- 收银台支付成功回调 -> 阶段2转实扣 底部绕行连线 -->
+                        <path d="M 415 212 L 415 234 L 820 234 L 820 214" fill="none" stroke="#16a34a" stroke-width="1.8" stroke-dasharray="5,3" marker-end="url(#arr-green)"/>
+                        <text x="615" y="230" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">支付成功异步回调触发阶段2转实扣</text>
+
+                        <!-- 逆向退费分隔标题带 -->
+                        <rect x="16" y="254" width="948" height="28" rx="5" fill="#0f2240"/>
+                        <text x="490" y="272" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">⬇ 逆向退款与双边退积分事务闭环链路（基于已生成独立主订单 Order 发起）</text>
+
+                        <path d="M 900 212 L 900 246 L 948 246 L 948 294 L 114 294 L 114 312" fill="none" stroke="#64748b" stroke-width="1.4" stroke-dasharray="3,3" marker-end="url(#arr-slate)"/>
+
+                        <!-- 第3行：逆向退款 4 步 -->
+                        <rect x="16" y="314" width="196" height="82" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="1.6"/>
+                        <text x="114" y="338" font-size="11" font-weight="bold" fill="#0f2240" text-anchor="middle">6. 用户申请退款</text>
+                        <text x="114" y="358" font-size="9.5" fill="#334155" text-anchor="middle">员工针对独立主订单</text>
+                        <text x="114" y="376" font-size="9" fill="#64748b" text-anchor="middle">发起逆向退费申请</text>
+
+                        <line x1="212" y1="355" x2="238" y2="355" stroke="#d97706" stroke-width="2" marker-end="url(#arr-amber)"/>
+
+                        <rect x="240" y="314" width="232" height="82" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.8"/>
+                        <text x="356" y="338" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">7. 前置强校验：级联取消预约</text>
+                        <text x="356" y="358" font-size="9.5" fill="#92400e" text-anchor="middle">强制级联取消关联预约单(Appointment)</text>
+                        <text x="356" y="376" font-size="9" fill="#334155" text-anchor="middle">同步释放体检分院排期名额</text>
+
+                        <line x1="472" y1="355" x2="498" y2="355" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="500" y="314" width="202" height="82" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="601" y="338" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">8. 发起 EPAY 现金原路退款</text>
+                        <text x="601" y="358" font-size="9.5" fill="#334155" text-anchor="middle">调用招行 EPAY 退回自付现金</text>
+                        <text x="601" y="376" font-size="9" fill="#0066cc" text-anchor="middle">等待资金退款成功异步回调</text>
+
+                        <line x1="702" y1="355" x2="728" y2="355" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <rect x="730" y="314" width="234" height="82" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                        <text x="847" y="336" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">9. 回调驱动并发退回双边积分</text>
+                        <text x="847" y="355" font-size="9.2" fill="#047857" text-anchor="middle">并发退回外部平台与核心镜像积分</text>
+                        <text x="847" y="373" font-size="8.8" fill="#334155" text-anchor="middle">异常查单落补偿表 → 定时重试/超限告警转人工</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== 场景 3 ==================== -->
+        <div class="scenario-pane" id="sc3">
+            <div class="panel">
+                <div class="panel-title">
+                    <span>🧾 场景 3：常规报销 &amp; 积分报销审核打款链路</span>
+                    <span class="metric-highlight">全额核准不部分核减 · 05付款失败原单改卡免复审直推</span>
+                </div>
+                <ul class="bullet-list" style="margin-bottom: 14px;">
+                    <li><b>核心复杂控制点：</b>区分<b>常规体检代报销</b>（<span class="subdomain-tag">01-体检报销</span>与预约互斥、<span class="subdomain-tag">02-复检报销</span>独立共存，支持员工/家属及双抬头发票、<span class="subdomain-tag">08-待寄送原件</span>）与<b>积分报销</b>（仅限员工本人个人发票、1:1 预冻结核心/薪福通/福粒三类积分源、回调已付款转实扣）；统一遵循<b>全额核准不部分核减</b>及 <b><span class="tag-amber">05-付款失败</span> 原单改卡免复审直推</b>。</li>
+                </ul>
+                <div class="svg-container" style="min-height: 400px;">
+                    <svg width="100%" height="100%" viewBox="0 0 980 405" style="max-width: 100%; display: block;">
+                        <!-- 起点 A -->
+                        <rect x="16" y="138" width="136" height="80" rx="8" fill="#0f2240"/>
+                        <text x="84" y="168" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">员工 / 家属发起</text>
+                        <text x="84" y="188" font-size="10" fill="#93c5fd" text-anchor="middle">事后报销申请</text>
+                        <text x="84" y="205" font-size="8.8" fill="#cbd5e1" text-anchor="middle">发票上传 + 绑收款卡</text>
+
+                        <!-- 分支线 A -> B1 & B2 -->
+                        <path d="M 152 162 L 168 162 L 168 68 L 182 68" fill="none" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+                        <path d="M 152 194 L 168 194 L 168 282 L 182 282" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <!-- 上分支：常规报销 -->
+                        <rect x="184" y="24" width="242" height="88" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="305" y="46" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">常规报销（员工/家属 · 双抬头发票）</text>
+                        <text x="305" y="66" font-size="9.3" fill="#1d4ed8" text-anchor="middle">• 01体检报销：权益互斥(禁与线上预约并存)</text>
+                        <text x="305" y="84" font-size="9.3" fill="#334155" text-anchor="middle">• 02复检报销：独立复检权益(与首检共存)</text>
+                        <text x="305" y="101" font-size="8.8" fill="#64748b" text-anchor="middle">支持疫苗及 KPMG 等大客户定制报销</text>
+
+                        <line x1="426" y1="68" x2="446" y2="68" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <rect x="448" y="24" width="166" height="88" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+                        <text x="531" y="50" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">提交入库：01-审核中</text>
+                        <text x="531" y="72" font-size="9.5" fill="#334155" text-anchor="middle">按项目规则流转</text>
+                        <text x="531" y="90" font-size="9.2" font-weight="bold" fill="#0066cc" text-anchor="middle">08-待寄送发票原件核验</text>
+
+                        <!-- 下分支：积分报销 -->
+                        <rect x="184" y="238" width="242" height="88" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.8"/>
+                        <text x="305" y="260" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">积分报销（仅员工本人 · 个人发票）</text>
+                        <text x="305" y="280" font-size="9.5" fill="#15803d" text-anchor="middle">体检 / 洁牙 / 眼科 / 健身卡 / 疫苗</text>
+                        <text x="305" y="299" font-size="9.2" fill="#334155" text-anchor="middle">按 1:1 预冻结积分（核心/薪福通/福粒）</text>
+
+                        <line x1="426" y1="282" x2="446" y2="282" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <rect x="448" y="238" width="166" height="88" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+                        <text x="531" y="266" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">提交入库：01-审核中</text>
+                        <text x="531" y="288" font-size="9.5" fill="#334155" text-anchor="middle">纯线上电子发票审核</text>
+                        <text x="531" y="306" font-size="9" fill="#64748b" text-anchor="middle">(无纸质原件寄送环节)</text>
+
+                        <!-- 汇合至 MIS 审核 D -->
+                        <path d="M 614 68 L 630 68 L 630 162 L 644 162" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr-slate)"/>
+                        <path d="M 614 282 L 630 282 L 630 194 L 644 194" fill="none" stroke="#64748b" stroke-width="1.8" marker-end="url(#arr-slate)"/>
+
+                        <rect x="646" y="132" width="148" height="92" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.8"/>
+                        <text x="720" y="158" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">◇ MIS 审核与操作</text>
+                        <text x="720" y="178" font-size="9.5" font-weight="bold" fill="#92400e" text-anchor="middle">全额核准原则</text>
+                        <text x="720" y="196" font-size="9" fill="#334155" text-anchor="middle">(不支持部分核减)</text>
+
+                        <!-- D 向上 -> D1 撤销/驳回 -->
+                        <line x1="720" y1="132" x2="720" y2="94" stroke="#dc2626" stroke-width="2" marker-end="url(#arr-red)"/>
+                        <text x="765" y="116" font-size="8.8" fill="#dc2626">撤销 / 审核驳回</text>
+
+                        <rect x="646" y="16" width="318" height="76" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.8"/>
+                        <text x="805" y="42" font-size="11" font-weight="bold" fill="#991b1b" text-anchor="middle">04-已取消 / 06-审核未通过</text>
+                        <text x="805" y="64" font-size="9.5" fill="#dc2626" text-anchor="middle">单据终止 · 积分报销驱动冻结积分原路解冻返还</text>
+
+                        <!-- D 向右 -> E 02-待付款 -->
+                        <line x1="794" y1="178" x2="820" y2="178" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+                        <text x="807" y="169" font-size="8.5" fill="#0066cc" text-anchor="middle">通过</text>
+
+                        <rect x="822" y="136" width="142" height="84" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="2"/>
+                        <text x="893" y="162" font-size="11.5" font-weight="bold" fill="#1e40af" text-anchor="middle">02-待付款</text>
+                        <text x="893" y="182" font-size="9.5" fill="#334155" text-anchor="middle">推送核心财务系统</text>
+                        <text x="893" y="199" font-size="9" fill="#0066cc" text-anchor="middle">等待异步打款回执</text>
+
+                        <!-- E 向下 -> F2 05-付款失败 & F1 03-已付款 -->
+                        <line x1="852" y1="220" x2="852" y2="238" stroke="#d97706" stroke-width="2" marker-end="url(#arr-amber)"/>
+
+                        <rect x="646" y="240" width="274" height="70" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.8"/>
+                        <text x="783" y="262" font-size="10.5" font-weight="bold" fill="#b45309" text-anchor="middle">⚠️ 05-付款失败（原单改卡免复审直推）</text>
+                        <text x="783" y="281" font-size="9" fill="#92400e" text-anchor="middle">积分维持冻结态不退回 · 原单号修改银行卡</text>
+                        <text x="783" y="298" font-size="8.8" font-weight="bold" fill="#b45309" text-anchor="middle">跳过人工复审直接重推财务（回到 02-待付款）</text>
+
+                        <!-- F2 回推 E 箭头 -->
+                        <path d="M 920 275 L 935 275 L 935 222" fill="none" stroke="#d97706" stroke-width="2" marker-end="url(#arr-amber)"/>
+
+                        <!-- E 直达 03-已付款 绿色箭头 -->
+                        <line x1="954" y1="220" x2="954" y2="318" stroke="#16a34a" stroke-width="2.2" marker-end="url(#arr-green)"/>
+
+                        <rect x="646" y="320" width="318" height="72" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                        <text x="805" y="345" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">✅ 03-已付款（核心财务打款成功闭环）</text>
+                        <text x="805" y="366" font-size="9.3" fill="#047857" text-anchor="middle">积分报销驱动冻结积分转实扣（扣减失败回滚 02 并记异常）</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     模块 04：系统页面入口渠道（PPT 第 4 页）
+     ========================================================= -->
+<div class="slide-card" id="slide4">
+    <div class="slide-header">
+        <div class="badge badge-primary">模块 04 · PPT 第 4 页</div>
+        <div class="slide-title">四、系统页面入口渠道</div>
+        <div class="slide-subtitle">采用「独立多端门户 + 内部宿主端嵌入 + 外部大客户免密接入」三层渠道矩阵，同一套后端服务与多租户配置支撑全渠道露出</div>
+    </div>
+
+    <div class="content-grid-wide-left">
+        <div class="panel panel-white">
+            <div class="panel-title">
+                <span>🌐 全渠道入口清单（3 大类别 · 7 类标准入口）</span>
+                <span class="metric-badge">同一套后端 + 多租户换肤</span>
+            </div>
+            <table class="sub-table">
+                <thead>
+                    <tr>
+                        <th style="width: 17%;">渠道类别</th>
+                        <th style="width: 25%;">具体入口名称</th>
+                        <th style="width: 15%;">载体形态</th>
+                        <th style="width: 13%;">独立入口</th>
+                        <th style="width: 30%;">主要面向人群与接入方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><span class="metric-badge">自有独立入口</span></td>
+                        <td><b>PC 端门户</b><br/><span class="subdomain-tag">new-pc</span></td>
+                        <td>PC Web</td>
+                        <td><span class="tag-new">是</span></td>
+                        <td>企业员工/家属，支持账号密码、验证码及企业专属域名/链接登录</td>
+                    </tr>
+                    <tr>
+                        <td><span class="metric-badge">自有独立入口</span></td>
+                        <td><b>移动端 H5</b><br/><span class="subdomain-tag">new-mobile</span></td>
+                        <td>Mobile H5</td>
+                        <td><span class="tag-new">是</span></td>
+                        <td>企业员工/家属，通过企业专属短链或二维码直接访问</td>
+                    </tr>
+                    <tr>
+                        <td><span class="metric-badge">自有独立入口</span></td>
+                        <td><b>MIS 运营后台</b><br/><span class="subdomain-tag">hmsc-mis-web</span></td>
+                        <td>内网 PC Web</td>
+                        <td><span class="tag-new">是</span></td>
+                        <td>内部运营与客服人员，用于企业配置、名单导入、公立履约核销与审核</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-new">内部宿主端露出</span></td>
+                        <td><b>微信公众号</b><br/>「招商信诺健康管理服务」</td>
+                        <td>公众号菜单 / H5</td>
+                        <td>嵌套 H5</td>
+                        <td>个人及企业客户通过公众号菜单跳转进入移动端 H5</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-new">内部宿主端露出</span></td>
+                        <td><b>微信小程序</b><br/>「招商信诺服务中心小程序」</td>
+                        <td>小程序嵌 H5</td>
+                        <td>嵌套 H5</td>
+                        <td>招商信诺客户在小程序服务入口进入体检福利页</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-new">内部宿主端露出</span></td>
+                        <td><b>自有与合作 APP</b><br/>「完美人生」「掌上健康」「招行 APP」</td>
+                        <td>APP 内嵌 H5</td>
+                        <td>嵌套 H5</td>
+                        <td>保单客户及招行渠道客户免二次查找，从 APP 健康服务入口直达</td>
+                    </tr>
+                    <tr>
+                        <td><span class="tag-amber">外部大客户免密</span></td>
+                        <td><b>薪福通</b>（招乎入口）、<b>Aon（怡安）、蒙牛、金风、希尔顿、西门子、特斯拉、远洋、丰享</b> 等</td>
+                        <td>免密中转页<br/><span class="subdomain-tag">/jump/:projectCode</span></td>
+                        <td>外部系统嵌入</td>
+                        <td>员工从企业自有门户/企微/招乎一键免密跳转，系统按策略自动鉴权并动态赋权</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <span>📐 【三层渠道接入矩阵与多租户统一底座架构图】</span>
+                <span class="tag-new">全渠道复用</span>
+            </div>
+            <div class="svg-container" style="min-height: 390px;">
+                <svg width="100%" height="100%" viewBox="0 0 540 400" style="max-width: 100%; display: block;">
+                    <!-- 三列渠道入口 -->
+                    <rect x="12" y="14" width="164" height="156" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+                    <text x="94" y="34" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">① 自有独立入口</text>
+                    <line x1="22" y1="42" x2="166" y2="42" stroke="#bfdbfe"/>
+                    <rect x="22" y="52" width="144" height="32" rx="4" fill="#ffffff" stroke="#93c5fd"/>
+                    <text x="94" y="72" font-size="9.5" font-weight="bold" fill="#1e3a8a" text-anchor="middle">PC 端门户 (new-pc)</text>
+                    <rect x="22" y="90" width="144" height="32" rx="4" fill="#ffffff" stroke="#93c5fd"/>
+                    <text x="94" y="110" font-size="9.5" font-weight="bold" fill="#1e3a8a" text-anchor="middle">移动端 H5 (new-mobile)</text>
+                    <rect x="22" y="128" width="144" height="32" rx="4" fill="#ffffff" stroke="#93c5fd"/>
+                    <text x="94" y="148" font-size="9.2" font-weight="bold" fill="#1e3a8a" text-anchor="middle">MIS 后台 (hmsc-mis-web)</text>
+
+                    <rect x="188" y="14" width="164" height="156" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+                    <text x="270" y="34" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">② 内部宿主端嵌套</text>
+                    <line x1="198" y1="42" x2="342" y2="42" stroke="#bbf7d0"/>
+                    <rect x="198" y="52" width="144" height="32" rx="4" fill="#ffffff" stroke="#86efac"/>
+                    <text x="270" y="72" font-size="9.2" font-weight="bold" fill="#166534" text-anchor="middle">公众号：健康管理服务</text>
+                    <rect x="198" y="90" width="144" height="32" rx="4" fill="#ffffff" stroke="#86efac"/>
+                    <text x="270" y="110" font-size="9.2" font-weight="bold" fill="#166534" text-anchor="middle">小程序：服务中心小程序</text>
+                    <rect x="198" y="128" width="144" height="32" rx="4" fill="#ffffff" stroke="#86efac"/>
+                    <text x="270" y="148" font-size="9" font-weight="bold" fill="#166534" text-anchor="middle">完美人生/掌上健康/招行APP</text>
+
+                    <rect x="364" y="14" width="164" height="156" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.6"/>
+                    <text x="446" y="34" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">③ 大客户免密接入</text>
+                    <line x1="374" y1="42" x2="518" y2="42" stroke="#fde68a"/>
+                    <rect x="374" y="52" width="144" height="32" rx="4" fill="#ffffff" stroke="#fcd34d"/>
+                    <text x="446" y="72" font-size="9.2" font-weight="bold" fill="#92400e" text-anchor="middle">/jump/:projectCode 中转</text>
+                    <rect x="374" y="90" width="144" height="32" rx="4" fill="#ffffff" stroke="#fcd34d"/>
+                    <text x="446" y="110" font-size="9" fill="#92400e" text-anchor="middle">薪福通(招乎) / Aon / 蒙牛</text>
+                    <rect x="374" y="128" width="144" height="32" rx="4" fill="#ffffff" stroke="#fcd34d"/>
+                    <text x="446" y="148" font-size="8.8" fill="#92400e" text-anchor="middle">西门子/特斯拉/希尔顿/金风等</text>
+
+                    <!-- 汇聚箭头 -->
+                    <line x1="94" y1="170" x2="94" y2="202" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+                    <line x1="270" y1="170" x2="270" y2="202" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+                    <line x1="446" y1="170" x2="446" y2="202" stroke="#d97706" stroke-width="2" marker-end="url(#arr-amber)"/>
+
+                    <!-- 统一网关与免密鉴权层 -->
+                    <rect x="12" y="204" width="516" height="58" rx="8" fill="#0f2240"/>
+                    <text x="270" y="227" font-size="11.5" font-weight="bold" fill="#ffffff" text-anchor="middle">统一接入网关与免密策略中枢 (hmsc-gateway / hmsc-edge-support)</text>
+                    <text x="270" y="247" font-size="9.5" fill="#93c5fd" text-anchor="middle">账号验证码登录 · RSA+JWT 宿主鉴权 · 企业 SSO Token 兑换与实时动态赋权</text>
+
+                    <line x1="270" y1="262" x2="270" y2="286" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                    <!-- 多租户渲染与后端统一服务层 -->
+                    <rect x="12" y="288" width="516" height="96" rx="8" fill="#f8fafc" stroke="#475569" stroke-width="1.6"/>
+                    <text x="270" y="310" font-size="11.5" font-weight="bold" fill="#0f2240" text-anchor="middle">同一套 HMSC 多租户配置与后端业务服务底座</text>
+                    <line x1="24" y1="318" x2="516" y2="318" stroke="#cbd5e1"/>
+                    <rect x="24" y="328" width="154" height="42" rx="5" fill="#eff6ff" stroke="#3b82f6"/>
+                    <text x="101" y="346" font-size="9.5" font-weight="bold" fill="#1e40af" text-anchor="middle">多租户皮肤/文案</text>
+                    <text x="101" y="361" font-size="8.5" fill="#334155" text-anchor="middle">独立主题与中英双语</text>
+
+                    <rect x="193" y="328" width="154" height="42" rx="5" fill="#ecfdf5" stroke="#10b981"/>
+                    <text x="270" y="346" font-size="9.5" font-weight="bold" fill="#047857" text-anchor="middle">差异化项目规则</text>
+                    <text x="270" y="361" font-size="8.5" fill="#334155" text-anchor="middle">承诺书/直赔/报销开关</text>
+
+                    <rect x="362" y="328" width="154" height="42" rx="5" fill="#fef3c7" stroke="#d97706"/>
+                    <text x="439" y="346" font-size="9.5" font-weight="bold" fill="#b45309" text-anchor="middle">全链路履约引擎</text>
+                    <text x="439" y="361" font-size="8.5" fill="#334155" text-anchor="middle">预约·积分·报告·报销</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     模块 05：系统接口情况（对外提供 / 主动调用）（PPT 第 5 页）
+     ========================================================= -->
+<div class="slide-card" id="slide5">
+    <div class="slide-header">
+        <div class="badge badge-primary">模块 05 · PPT 第 5 页</div>
+        <div class="slide-title">五、系统接口情况（对外提供 / 主动调用）</div>
+        <div class="slide-subtitle">上下游统一口径：<b>上游</b>指调用/接入 HMSC 的宿主渠道与外部大客户系统；<b>下游</b>指 HMSC 依赖的底层核心与履约底座（以 member-core-health 为核心中枢）</div>
+    </div>
+
+    <div class="content-vertical">
+        <!-- 上下游接口全景拓扑图 -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>📐 【HMSC 上下游接口调用与异步回调全景拓扑图】</span>
+                <span class="metric-badge">4 类对外提供 · 7 类主动调用</span>
+            </div>
+            <div class="svg-container" style="min-height: 250px;">
+                <svg width="100%" height="100%" viewBox="0 0 960 255" style="max-width: 100%; display: block;">
+                    <!-- 左：上游调用方 -->
+                    <rect x="14" y="14" width="256" height="226" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                    <text x="142" y="35" font-size="11.5" font-weight="bold" fill="#1e40af" text-anchor="middle">上游：宿主渠道与外部大客户系统</text>
+                    <line x1="24" y1="43" x2="260" y2="43" stroke="#bfdbfe"/>
+
+                    <rect x="24" y="53" width="236" height="50" rx="5" fill="#ffffff" stroke="#93c5fd"/>
+                    <text x="142" y="72" font-size="10" font-weight="bold" fill="#1e3a8a" text-anchor="middle">内部宿主渠道 (APP/小程序/公众号)</text>
+                    <text x="142" y="90" font-size="8.8" fill="#334155" text-anchor="middle">完美人生 · 掌上健康 · 招行APP · 服务中心小程序</text>
+
+                    <rect x="24" y="113" width="236" height="54" rx="5" fill="#ffffff" stroke="#93c5fd"/>
+                    <text x="142" y="132" font-size="10" font-weight="bold" fill="#1e3a8a" text-anchor="middle">外部大客户免密 SSO 系统</text>
+                    <text x="142" y="150" font-size="8.8" fill="#334155" text-anchor="middle">薪福通(招乎)/Aon/蒙牛/西门子/特斯拉/丰享等</text>
+
+                    <rect x="24" y="177" width="236" height="50" rx="5" fill="#fef3c7" stroke="#d97706"/>
+                    <text x="142" y="196" font-size="10" font-weight="bold" fill="#b45309" text-anchor="middle">反向认证接口（被 HMSC 反查）</text>
+                    <text x="142" y="214" font-size="8.8" fill="#92400e" text-anchor="middle">校验外部企业 Token 有效性及员工岗位身份</text>
+
+                    <!-- 左 <-> 中 交互箭头 -->
+                    <line x1="270" y1="78" x2="346" y2="78" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+                    <text x="308" y="70" font-size="8.5" fill="#0066cc" text-anchor="middle">RSA+JWT</text>
+
+                    <line x1="270" y1="140" x2="346" y2="140" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+                    <text x="308" y="132" font-size="8.5" fill="#0066cc" text-anchor="middle">免密SSO</text>
+
+                    <line x1="348" y1="202" x2="272" y2="202" stroke="#d97706" stroke-width="2" marker-end="url(#arr-amber)"/>
+                    <text x="308" y="194" font-size="8.5" fill="#b45309" text-anchor="middle">Feign反查</text>
+
+                    <!-- 中：HMSC 核心编排与网关层 -->
+                    <rect x="348" y="14" width="264" height="226" rx="8" fill="#0f2240"/>
+                    <text x="480" y="36" font-size="12" font-weight="bold" fill="#ffffff" text-anchor="middle">HMSC 企业体检福利平台</text>
+                    <line x1="360" y1="44" x2="600" y2="44" stroke="#334155"/>
+
+                    <rect x="362" y="55" width="236" height="44" rx="5" fill="#1e3a8a" stroke="#3b82f6"/>
+                    <text x="480" y="74" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">统一业务网关 hmsc-gateway</text>
+                    <text x="480" y="90" font-size="8.8" fill="#93c5fd" text-anchor="middle">RSA加密 + Base64 + JWT 鉴权</text>
+
+                    <rect x="362" y="109" width="236" height="54" rx="5" fill="#1e3a8a" stroke="#3b82f6"/>
+                    <text x="480" y="128" font-size="10" font-weight="bold" fill="#ffffff" text-anchor="middle">边缘集成层 hmsc-edge-support</text>
+                    <text x="480" y="144" font-size="8.5" fill="#93c5fd" text-anchor="middle">免密中转 · 异步回调端点(供应商/EPAY/TBDS/财务)</text>
+                    <text x="480" y="157" font-size="8.5" fill="#a7f3d0" text-anchor="middle">短效RSA令牌供小诺回查EWP/SWP · 联动HMES/SWP</text>
+
+                    <rect x="362" y="173" width="236" height="54" rx="5" fill="#1e293b" stroke="#64748b"/>
+                    <text x="480" y="192" font-size="10" font-weight="bold" fill="#f8fafc" text-anchor="middle">主动编排与异步通信引擎</text>
+                    <text x="480" y="209" font-size="8.5" fill="#cbd5e1" text-anchor="middle">Feign HTTP · RabbitMQ Direct · 专线 SFTP</text>
+                    <text x="480" y="221" font-size="8.5" fill="#cbd5e1" text-anchor="middle">SSE 流式 · 国密 SM4+SM3 · AES-GCM</text>
+
+                    <!-- 中 <-> 右 交互箭头 -->
+                    <line x1="612" y1="88" x2="686" y2="88" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+                    <text x="649" y="80" font-size="8.5" fill="#15803d" text-anchor="middle">主动调用</text>
+
+                    <line x1="688" y1="158" x2="614" y2="158" stroke="#0066cc" stroke-width="2" stroke-dasharray="4,3" marker-end="url(#arr-blue)"/>
+                    <text x="649" y="150" font-size="8.5" fill="#0066cc" text-anchor="middle">异步回调/回查</text>
+
+                    <!-- 右：8大下游底座与关联系统 -->
+                    <rect x="688" y="14" width="258" height="226" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.8"/>
+                    <text x="817" y="35" font-size="11.5" font-weight="bold" fill="#166534" text-anchor="middle">下游：8大核心底座与三方服务</text>
+                    <line x1="698" y1="43" x2="936" y2="43" stroke="#bbf7d0"/>
+
+                    <text x="702" y="64" font-size="9.2" fill="#1e293b">1. <tspan font-weight="bold" fill="#166534">member-core-health</tspan> &amp; HMC 核心/财务</text>
+                    <text x="702" y="88" font-size="9.2" fill="#1e293b">2. <tspan font-weight="bold" fill="#166534">17+ 体检供应商</tspan> (爱康/京东/嘉会/乐荐等)</text>
+                    <text x="702" y="112" font-size="9.2" fill="#1e293b">3. <tspan font-weight="bold" fill="#166534">积分平台 &amp; 支付</tspan> (核心/福粒/薪福通/EPAY)</text>
+                    <text x="702" y="136" font-size="9.2" fill="#1e293b">4. <tspan font-weight="bold" fill="#166534">TBDS 大数据推荐</tspan> (AI推荐 &amp; 套餐对比)</text>
+                    <text x="702" y="160" font-size="9.2" fill="#1e293b">5. <tspan font-weight="bold" fill="#166534">member-core-sign</tspan> &amp; 211 保险核心(SFTP)</text>
+                    <text x="702" y="184" font-size="9.2" fill="#1e293b">6. <tspan font-weight="bold" fill="#166534">HMES 健康档案</tspan> / 大模型 OCR</text>
+                    <text x="702" y="208" font-size="9.2" fill="#1e293b">7. <tspan font-weight="bold" fill="#166534">Dify 普惠AI</tspan> &amp; C24/C59 三方专科医生解读</text>
+                    <text x="702" y="230" font-size="9.2" fill="#1e293b">8. <tspan font-weight="bold" fill="#166534">小诺健康 AI</tspan> (SM4/SM3) &amp; 在线客服(AES)</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 表1 & 表2 -->
+        <div class="content-grid">
+            <div class="panel panel-white">
+                <div class="ba-head ba-exam">
+                    <span>📡 1. 对外提供接口（面向调用方 / 上游与回调方）</span>
+                    <span style="font-size: 11.5px;">共 4 大类</span>
+                </div>
+                <table class="sub-table ba-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 22%;">方向/类别</th>
+                            <th style="width: 26%;">典型对接方</th>
+                            <th style="width: 34%;">主要提供接口能力</th>
+                            <th style="width: 18%;">接入方式</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><b>服务上游：<br/>内部宿主渠道</b></td>
+                            <td>完美人生、掌上健康、招行 APP、招商信诺服务中心小程序、公众号</td>
+                            <td>统一网关业务 API（登录鉴权、权益/套餐/分院查询、预约/改期/取消、报告查看、报销提交）</td>
+                            <td><span class="subdomain-tag">hmsc-gateway</span><br/>RSA加密 + Base64 + JWT</td>
+                        </tr>
+                        <tr>
+                            <td><b>服务上游：<br/>外部大客户系统</b></td>
+                            <td>薪福通（招乎）、Aon、蒙牛、金风、希尔顿、西门子、特斯拉、远洋、丰享等</td>
+                            <td>免密单点登录（SSO）中转与 Token 换取、动态权益同步、定制化项目接入</td>
+                            <td><span class="subdomain-tag">hmsc-edge-support</span><br/>免密中转策略</td>
+                        </tr>
+                        <tr>
+                            <td><b>服务内部关联<br/>与 AI 系统</b></td>
+                            <td>健康档案系统（HMES）、散客/个险体检（SWP）、大数据推荐服务（TBDS）、<b>小诺健康 AI</b></td>
+                            <td>体检权益/订单状态查询、报告数据联动与状态通知；向<b>小诺健康 AI</b> 提供短效 RSA 令牌反向加密拉取团检（EWP）/散客（SWP）报告</td>
+                            <td><span class="subdomain-tag">hmsc-edge-support</span><br/>内部接口 &amp; 加密回查</td>
+                        </tr>
+                        <tr>
+                            <td><b>接收外部与下游<br/>异步回调</b></td>
+                            <td>体检供应商（爱康、京东健康、嘉会、乐荐等）、<b>招行 EPAY 支付网关</b>、<b>TBDS</b>、<b>健康管理核心财务（HMC）</b></td>
+                            <td>接收机构预约取消/到检/出报告回调、EPAY 支付与原路退款结果回调（驱动退积分）、TBDS 报告推荐异步结果回调、财务打款状态回执</td>
+                            <td><span class="subdomain-tag">hmsc-edge-support</span><br/>网关回调端点</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="panel panel-white">
+                <div class="ba-head ba-core">
+                    <span>🚀 2. 主动调用接口（反查上游 + 调用 8 大下游核心与三方能力）</span>
+                    <span style="font-size: 11.5px;">共 7 大类</span>
+                </div>
+                <table class="sub-table ba-table">
+                    <thead>
+                        <tr>
+                            <th style="width: 14%;">方向</th>
+                            <th style="width: 28%;">目标系统</th>
+                            <th style="width: 39%;">核心调用动作</th>
+                            <th style="width: 19%;">通信方式</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><span class="tag-amber">反查上游</span></td>
+                            <td><b>外部大客户认证接口</b>（薪福通、西门子、丰享等）</td>
+                            <td>免密登录时反查外部企业 Token 有效性及员工岗位身份，触发动态赋权</td>
+                            <td>Feign HTTP</td>
+                        </tr>
+                        <tr>
+                            <td><span class="metric-badge">调用下游</span></td>
+                            <td><b>健康核心代理（member-core-health）&amp; HMC 核心/财务</b></td>
+                            <td>统调项目/权益/排期/15分钟占容、17+ 供应商锁单改退、报销/积分报销打款推送；订单/预约异步同步至 HMC</td>
+                            <td>Feign HTTP + RabbitMQ Direct</td>
+                        </tr>
+                        <tr>
+                            <td><span class="metric-badge">调用下游</span></td>
+                            <td><b>外部积分福利平台 &amp; 支付网关</b>（核心积分/福粒/薪福通/招行 EPAY）</td>
+                            <td>积分 SKU 级两阶段冻结/实扣/查单/退积分，收银台调起与原路退款</td>
+                            <td>Feign HTTP / 异步回调</td>
+                        </tr>
+                        <tr>
+                            <td><span class="metric-badge">调用下游</span></td>
+                            <td><b>大数据推荐服务（TBDS）</b></td>
+                            <td>问卷/历史体检报告 AI 智能套餐推荐（异步回调）及无状态套餐对比</td>
+                            <td>Feign HTTP / 异步回调</td>
+                        </tr>
+                        <tr>
+                            <td><span class="metric-badge">调用下游</span></td>
+                            <td><b>电子签名服务（member-core-sign）&amp; 211 保险核心系统</b></td>
+                            <td>商保直赔前置电子签名校验与 PDF 盖章合成，理赔资料归档 211 保险核心结案</td>
+                            <td>Feign HTTP + 专线 SFTP</td>
+                        </tr>
+                        <tr>
+                            <td><span class="metric-badge">调用下游</span></td>
+                            <td><b>健康档案系统（HMES）/大模型 OCR &amp; 报告解读服务</b></td>
+                            <td>PDF 报告分页推送大模型 OCR 解析归档 HMES；调用普惠 AI 解读（Dify）与派发三方专科医生解读工单（C24/C59）</td>
+                            <td>Feign HTTP / SSE / 定时补偿</td>
+                        </tr>
+                        <tr>
+                            <td><span class="metric-badge">调用下游</span></td>
+                            <td><b>小诺健康 AI &amp; 保险在线客服</b></td>
+                            <td>国密 SM4 加密 + SM3 签名免登跳转小诺多 Agent（报告解读/心理咨询），提供短效 RSA 令牌供小诺安全回查 EWP/SWP 报告；AES-GCM 免登在线客服</td>
+                            <td>国密免登 + 反向加密拉取 / AES-GCM</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     模块 06：从下游获取数据情况（PPT 第 6 页）
+     ========================================================= -->
+<div class="slide-card" id="slide6">
+    <div class="slide-header">
+        <div class="badge badge-primary">模块 06 · PPT 第 6 页</div>
+        <div class="slide-title">六、从下游获取数据情况</div>
+        <div class="slide-subtitle">HMSC 作为前置业务应用与履约编排层，核心主数据、履约终态、签章凭证与资金回执均从 <b>8 大下游核心系统</b>（以 member-core-health 为中枢）实时拉取或由定时任务（hmsc-innovate-jobs XXL-Job）异步获取</div>
+    </div>
+
+    <div class="content-vertical">
+        <!-- 下游数据获取方式示意条 -->
+        <div class="panel">
+            <div class="panel-title">
+                <span>📐 【下游 8 大核心系统数据获取机制与业务消费全景图】</span>
+                <span class="tag-new">实时 Feign + XXL-Job 轮询 + 异步回调 + 专线 SFTP</span>
+            </div>
+            <div class="svg-container" style="min-height: 185px;">
+                <svg width="100%" height="100%" viewBox="0 0 960 175" style="max-width: 100%; display: block;">
+                    <rect x="14" y="14" width="218" height="148" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.6"/>
+                    <text x="123" y="36" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">① 实时拉取类主数据</text>
+                    <line x1="24" y1="44" x2="222" y2="44" stroke="#bfdbfe"/>
+                    <text x="26" y="64" font-size="9.2" fill="#334155">• HMC 项目/团单/套餐/分院/排期</text>
+                    <text x="26" y="84" font-size="9.2" fill="#334155">• 供应商实时排期库存与锁单结果</text>
+                    <text x="26" y="104" font-size="9.2" fill="#334155">• 员工可用积分余额与有效期</text>
+                    <text x="26" y="124" font-size="9.2" fill="#334155">• TBDS 套餐共有项/差异项对比矩阵</text>
+                    <text x="123" y="148" font-size="9" font-weight="bold" fill="#0066cc" text-anchor="middle">方式：实时 Feign 同步查询</text>
+
+                    <line x1="232" y1="88" x2="254" y2="88" stroke="#0066cc" stroke-width="1.8" marker-end="url(#arr-blue)"/>
+
+                    <rect x="256" y="14" width="218" height="148" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.6"/>
+                    <text x="365" y="36" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">② 履约状态与报告回传</text>
+                    <line x1="266" y1="44" x2="464" y2="44" stroke="#bbf7d0"/>
+                    <text x="268" y="64" font-size="9.2" fill="#334155">• 17+供应商取消 / 已到检(04)状态</text>
+                    <text x="268" y="84" font-size="9.2" fill="#334155">• 原版 PDF 体检报告文件</text>
+                    <text x="268" y="104" font-size="9.2" fill="#334155">• HMES 结构化指标与异常指标</text>
+                    <text x="268" y="124" font-size="9.2" fill="#334155">• TBDS 异步推荐打分结果</text>
+                    <text x="365" y="148" font-size="9" font-weight="bold" fill="#15803d" text-anchor="middle">方式：XXL-Job 轮询 + 异步回调</text>
+
+                    <line x1="474" y1="88" x2="496" y2="88" stroke="#16a34a" stroke-width="1.8" marker-end="url(#arr-green)"/>
+
+                    <rect x="498" y="14" width="218" height="148" rx="8" fill="#fef3c7" stroke="#d97706" stroke-width="1.6"/>
+                    <text x="607" y="36" font-size="11" font-weight="bold" fill="#b45309" text-anchor="middle">③ 资金·积分·签章回执</text>
+                    <line x1="508" y1="44" x2="706" y2="44" stroke="#fde68a"/>
+                    <text x="510" y="64" font-size="9.2" fill="#334155">• 积分冻结/实扣/退积分流水与对账</text>
+                    <text x="510" y="84" font-size="9.2" fill="#334155">• 招行 EPAY 支付与原路退款回执</text>
+                    <text x="510" y="104" font-size="9.2" fill="#334155">• 核心财务审核金额与打款状态回执</text>
+                    <text x="510" y="124" font-size="9.2" fill="#334155">• 动态盖章理赔授权PDF &amp; SFTP状态</text>
+                    <text x="607" y="148" font-size="9" font-weight="bold" fill="#b45309" text-anchor="middle">方式：异步回传 + 镜像对账 + SFTP</text>
+
+                    <line x1="716" y1="88" x2="738" y2="88" stroke="#d97706" stroke-width="1.8" marker-end="url(#arr-amber)"/>
+
+                    <rect x="740" y="14" width="206" height="148" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="1.8"/>
+                    <text x="843" y="36" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">④ 检后 AI 与医生解读</text>
+                    <line x1="750" y1="44" x2="936" y2="44" stroke="#a7f3d0"/>
+                    <text x="752" y="64" font-size="9.2" fill="#334155">• Dify 普惠AI即时指标成因建议</text>
+                    <text x="752" y="84" font-size="9.2" fill="#334155">• C24/C59 三方专科医生解读结论</text>
+                    <text x="752" y="104" font-size="9.2" fill="#334155">• 小诺多Agent深度解读与心理咨询</text>
+                    <text x="752" y="124" font-size="9.2" fill="#334155">• 短效RSA令牌双向报告安全联动</text>
+                    <text x="843" y="148" font-size="9" font-weight="bold" fill="#047857" text-anchor="middle">方式：SSE + 工单回调 + 国密免登</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- 9行完整数据明细表 -->
+        <div class="panel panel-white">
+            <div class="ba-head ba-exam">
+                <span>📊 下游获取核心数据明细清单（全量 9 大数据来源）</span>
+                <span style="font-size: 12px;">核心中枢：member-core-health &amp; hmsc-innovate-jobs (XXL-Job)</span>
+            </div>
+            <table class="sub-table ba-table">
+                <thead>
+                    <tr>
+                        <th style="width: 21%;">下游数据来源</th>
+                        <th style="width: 35%;">获取的核心数据内容</th>
+                        <th style="width: 17%;">获取方式</th>
+                        <th style="width: 27%;">业务用途</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>健康管理核心（HMC）</b><br/><span class="subdomain-tag">经 member-core-health</span></td>
+                        <td>企业项目配置、团单与保单理赔标识、产品包（P/G）、标准/升级/加价/加项套餐、分院清单与营业状态、门店排期与上限、机构私有套餐编码映射</td>
+                        <td><span class="metric-badge">实时 Feign 查询</span></td>
+                        <td>驱动前台套餐过滤、套餐门店交集匹配、排期日历渲染及商保直赔门禁判断</td>
+                    </tr>
+                    <tr>
+                        <td><b>17+ 民营体检供应商</b><br/><span class="subdomain-tag">经健康核心代理</span></td>
+                        <td>实时排期库存、预约锁单结果、机构侧取消状态、<b>已到检（04）状态</b>、出报告状态与 <b>原版 PDF 体检报告</b></td>
+                        <td><span class="tag-new">实时调用 + XXL-Job 定时轮询 / 回调</span></td>
+                        <td>驱动预约状态机扭转、确立供应商采购结算里程碑（04）、交付员工体检报告</td>
+                    </tr>
+                    <tr>
+                        <td><b>外部积分福利平台 &amp; 支付网关</b><br/><span class="subdomain-tag">核心积分/福粒/薪福通/招行EPAY</span></td>
+                        <td>员工可用福利积分余额、积分有效期、预冻结/实扣/查单与退积分终态流水；<b>招行 EPAY 支付成功回执、原路退款成功回执与退款查单结果</b></td>
+                        <td><span class="tag-amber">实时调用 + 异步回调 + 本地镜像对账</span></td>
+                        <td>支持下单 1:1 积分抵扣、家属积分共济、混合支付收银与<b>退款回调驱动退积分</b>事务闭环</td>
+                    </tr>
+                    <tr>
+                        <td><b>核心财务系统</b><br/><span class="subdomain-tag">经健康核心代理</span></td>
+                        <td>常规报销与积分报销的审核结果、核定金额、<b>财务打款状态回执</b>（待付款 / 已付款 / 付款失败）</td>
+                        <td><span class="metric-badge">异步同步 / 状态回传</span></td>
+                        <td>向员工实时展示报销进度，驱动积分报销转实扣及付款失败后的原单改卡重推</td>
+                    </tr>
+                    <tr>
+                        <td><b>电子签名服务 &amp; 211 保险核心</b><br/><span class="subdomain-tag">member-core-sign</span></td>
+                        <td>手写电子签名轨迹合法性校验结果、合成电子签名图、<b>动态盖章后的《体检理赔申请授权书 PDF》</b>及 SFTP 归档状态</td>
+                        <td><span class="tag-amber">实时 Feign + 专线 SFTP</span></td>
+                        <td>支撑团检（EWP）/散客（SWP）商保直赔前置门禁存证，并驱动 211 保险核心自动理赔结案</td>
+                    </tr>
+                    <tr>
+                        <td><b>大数据推荐服务（TBDS）</b></td>
+                        <td>问卷/历史报告异步打分推荐结果（主套餐/加项分值与补充项）、套餐共有项/差异项对比矩阵</td>
+                        <td><span class="metric-badge">异步回调 + 实时查询</span></td>
+                        <td>支撑智能选检自动勾选推荐套餐与标准医学字典级套餐对比</td>
+                    </tr>
+                    <tr>
+                        <td><b>健康档案系统（HMES）&amp; 大模型 OCR</b></td>
+                        <td>全量 PDF 报告抽取的<b>结构化检测指标与异常指标（Abnormal Findings）</b>、历年历史体检档案</td>
+                        <td><span class="tag-new">异步解析回写 / 查询</span></td>
+                        <td>支撑移动端报告结构化查阅、历年趋势对比及 B 端 HR 异常监控看板</td>
+                    </tr>
+                    <tr>
+                        <td><b>报告解读服务</b><br/><span class="subdomain-tag">Dify 普惠AI &amp; C24/C59三方医生</span></td>
+                        <td>普惠 AI 即时指标成因与调理建议、三方专科医生出具的结构化<b>报告解读结论</b></td>
+                        <td><span class="tag-new">实时 SSE / 异步工单回调</span></td>
+                        <td>提供项目级普惠 AI 解读，以及永久挂载在权益报告项下的专业医生解读交付</td>
+                    </tr>
+                    <tr>
+                        <td><b>小诺健康 AI</b><br/><span class="subdomain-tag">多 Agent 健康服务</span></td>
+                        <td>小诺多 Agent 免登授权会话与交互式智能健康服务能力（<b>体检报告 AI 深度解读</b>、<b>心理咨询</b>等多 Agent 问答结果），并基于短效 RSA 令牌与团检（EWP）/散客（SWP）报告双向联动</td>
+                        <td><span class="tag-amber">国密 SM4+SM3 免登跳转 + 反向加密拉取</span></td>
+                        <td>在四要素隐私门禁保护下，为员工与个险客户提供多 Agent 体检报告解读与心理咨询能力，完善检后智能健康管理闭环</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     模块 07：改动需求频率 & 运维问题情况（PPT 第 7 页）
+     ========================================================= -->
+<div class="slide-card" id="slide7">
+    <div class="slide-header">
+        <div class="badge badge-warning">模块 07 · PPT 第 7 页</div>
+        <div class="slide-title">七、改动需求频率 &amp; 运维问题情况</div>
+        <div class="slide-subtitle">客观评估研发变更强度与生产运维工单构成 · 沉淀「定制配置化 + 配置防错培训 + 全链路异常监控」三大治理抓手</div>
+    </div>
+
+    <!-- 综合评估双卡片 -->
+    <div class="eval-cards">
+        <div class="eval-card high">
+            <div class="eval-level">高</div>
+            <div class="eval-info">
+                <h3>评估维度 1：改动需求频率 — 等级【高】</h3>
+                <p>新签企业接入与存量企业年度方案更新均伴随大量定制开发，长期处于高频迭代状态。</p>
+            </div>
+        </div>
+        <div class="eval-card many">
+            <div class="eval-level">多</div>
+            <div class="eval-info">
+                <h3>评估维度 2：运维问题情况 — 等级【多】</h3>
+                <p>业务/运营配置复杂导致的配置错误与咨询类工单居多，叠加外部供应商与对账类运维排查。</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="content-grid">
+        <div class="panel">
+            <div class="panel-title">
+                <span>📌 高频变更驱动源、运维痛点与已落地应对措施</span>
+                <span class="metric-badge">成因剖析 &amp; 治理现状</span>
+            </div>
+            <ul class="bullet-list">
+                <li><b>1. 高频变更的三大主要驱动源：</b>
+                    <ul>
+                        <li><b>新增企业客户定制开发：</b>每签约一家新企业大客户，通常涉及专属免密登录对接、定制主题/页面文案、专属报销/问卷规则、专属劳资健康承诺书等差异化需求（如<b>毕马威、蒙牛、希尔顿、保乐力加、Aon</b> 等均存在企业级独立定制逻辑）。</li>
+                        <li><b>存量企业年度方案定制迭代：</b>已合作企业在每年开启新一轮年度体检方案时，仍会提出新的定制要求（如积分抵扣/报销规则调整、家属包补贴策略变化、新增加项包互斥/限额逻辑等）。</li>
+                        <li><b>外部生态与合规整改：</b>17+ 体检供应商接口升级适配、安全渗透测试漏洞修复及数据脱敏/DLP 审计合规持续加固。</li>
+                    </ul>
+                </li>
+                <li><b>2. 运维问题偏多的三大核心痛点：</b>
+                    <ul>
+                        <li><b>复杂配置错误与咨询类问题（占比高）：</b>平台多租户配置链路长（企业项目配置、产品包 P/G 划分、套餐私有编码映射、分院白名单、项目屏蔽日、停业策略、Apollo 动态参数等），任一环节配置遗漏或错误都会直接导致前台看不到套餐/分院或无法预约，引发大量业务咨询与研发协助排查。</li>
+                        <li><b>外部供应商与线下履约异常：</b>17+ 民营体检机构直连偶发超时、排期不同步或锁单失败（07）；分院临时停业需触发降级协调改约；公立医院依赖线下人工确认与核销。</li>
+                        <li><b>资金/积分/报销与名单数据异常：</b>积分两阶段扣减/回调退积分对账、财务报销打款失败重试、HR 批量导入员工名单格式或四要素冲突等需要定时核查与人工介入。</li>
+                    </ul>
+                </li>
+                <li><b>3. 已落地的三大治理与应对措施：</b>
+                    <ul>
+                        <li><b>定制配置化（<span class="tag-new">已落地</span>）：</b>常规共性定制（通用免密策略、标准报销规则、常规承诺书等）已沉淀为<b>标准可配置能力</b>；高频研发改动主要集中在头部大客户及年度方案不断新增的超边界非标定制。</li>
+                        <li><b>配置培训与前置防错（<span class="metric-badge">已推进</span>）：</b>已将高频配置错误与业务咨询问题系统整理并开展<b>专项培训</b>，后续可结合 MIS 上线前配置完整性校验进一步压降配置类工单。</li>
+                        <li><b>全链路异常监控（<span class="tag-new">已落地</span>）：</b>体检平台<b>已建设异常监控系统</b>，所有业务与外部接口异常均可实时暴露并告警，保障问题快速感知与处置。</li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+
+        <div class="panel">
+            <div class="panel-title">
+                <span>📐 【研发高频变更与运维痛点三维治理对应图】</span>
+                <span class="tag-new">问题 ➔ 治理闭环</span>
+            </div>
+            <div class="svg-container" style="min-height: 410px;">
+                <svg width="100%" height="100%" viewBox="0 0 500 415" style="max-width: 100%; display: block;">
+                    <!-- 左列标题 -->
+                    <rect x="14" y="12" width="214" height="32" rx="6" fill="#0f2240"/>
+                    <text x="121" y="33" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">挑战侧：高频需求 &amp; 运维痛点</text>
+
+                    <!-- 右列标题 -->
+                    <rect x="272" y="12" width="214" height="32" rx="6" fill="#166534"/>
+                    <text x="379" y="33" font-size="11" font-weight="bold" fill="#ffffff" text-anchor="middle">治理侧：已落地/推进应对防线</text>
+
+                    <!-- 组1：大客户/年度定制 -> 定制配置化 -->
+                    <rect x="14" y="56" width="214" height="104" rx="8" fill="#fef2f2" stroke="#dc2626" stroke-width="1.6"/>
+                    <text x="121" y="77" font-size="10.8" font-weight="bold" fill="#991b1b" text-anchor="middle">🔥 高频定制需求冲击</text>
+                    <line x1="24" y1="84" x2="218" y2="84" stroke="#fecaca"/>
+                    <text x="24" y="102" font-size="9" fill="#334155">• 新签大客户差异化(KPMG/蒙牛/Aon等)</text>
+                    <text x="24" y="120" font-size="9" fill="#334155">• 存量客户每年新一轮方案规则迭代</text>
+                    <text x="24" y="138" font-size="9" fill="#334155">• 免密/换肤/承诺书/积分互斥定制多</text>
+
+                    <line x1="228" y1="108" x2="270" y2="108" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                    <rect x="272" y="56" width="214" height="104" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.8"/>
+                    <text x="379" y="77" font-size="10.8" font-weight="bold" fill="#166534" text-anchor="middle">✅ 防线1：定制配置化 [已落地]</text>
+                    <line x1="282" y1="84" x2="476" y2="84" stroke="#bbf7d0"/>
+                    <text x="282" y="103" font-size="9.2" fill="#15803d">• 通用免密策略沉淀为标准配置</text>
+                    <text x="282" y="122" font-size="9.2" fill="#15803d">• 标准报销规则与常规承诺书配置化</text>
+                    <text x="282" y="141" font-size="9" fill="#334155">• 研发聚焦头部客户超边界非标定制</text>
+
+                    <!-- 组2：多租户长链路配置错漏 -> 专项培训与前置防错 -->
+                    <rect x="14" y="176" width="214" height="104" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.6"/>
+                    <text x="121" y="197" font-size="10.8" font-weight="bold" fill="#b45309" text-anchor="middle">⚠️ 多租户配置错漏咨询占比高</text>
+                    <line x1="24" y1="204" x2="218" y2="204" stroke="#fde68a"/>
+                    <text x="24" y="222" font-size="9" fill="#334155">• 项目/P&amp;G包/私有编码/分院白名单</text>
+                    <text x="24" y="240" font-size="9" fill="#334155">• 项目屏蔽日 / 停业策略 / Apollo参数</text>
+                    <text x="24" y="258" font-size="9" fill="#334155">• 任一漏配致前台无套餐/无法预约</text>
+
+                    <line x1="228" y1="228" x2="270" y2="228" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                    <rect x="272" y="176" width="214" height="104" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                    <text x="379" y="197" font-size="10.8" font-weight="bold" fill="#1e40af" text-anchor="middle">📘 防线2：培训与防错 [已推进]</text>
+                    <line x1="282" y1="204" x2="476" y2="204" stroke="#bfdbfe"/>
+                    <text x="282" y="223" font-size="9.2" fill="#1d4ed8">• 系统梳理高频配置错漏与咨询清单</text>
+                    <text x="282" y="242" font-size="9.2" fill="#1d4ed8">• 面向运营团队开展配置专项培训</text>
+                    <text x="282" y="261" font-size="9" fill="#334155">• 后续演进：MIS 上线前配置完整性校验</text>
+
+                    <!-- 组3：外部供应商与资金积分异常 -> 全链路异常监控 -->
+                    <rect x="14" y="296" width="214" height="104" rx="8" fill="#fffbeb" stroke="#d97706" stroke-width="1.6"/>
+                    <text x="121" y="317" font-size="10.8" font-weight="bold" fill="#b45309" text-anchor="middle">🔌 外部机构与资金积分异常</text>
+                    <line x1="24" y1="324" x2="218" y2="324" stroke="#fde68a"/>
+                    <text x="24" y="342" font-size="9" fill="#334155">• 17+民营直连超时/锁单失败(07)/停业</text>
+                    <text x="24" y="360" font-size="9" fill="#334155">• 积分两阶段扣退对账 / 财务打款重试</text>
+                    <text x="24" y="378" font-size="9" fill="#334155">• HR 名单导入四要素冲突与安全加固</text>
+
+                    <line x1="228" y1="348" x2="270" y2="348" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                    <rect x="272" y="296" width="214" height="104" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.8"/>
+                    <text x="379" y="317" font-size="10.8" font-weight="bold" fill="#166534" text-anchor="middle">🛡️ 防线3：异常监控系统 [已落地]</text>
+                    <line x1="282" y1="324" x2="476" y2="324" stroke="#bbf7d0"/>
+                    <text x="282" y="343" font-size="9.2" fill="#15803d">• 已建成平台级全链路异常监控体系</text>
+                    <text x="282" y="362" font-size="9.2" fill="#15803d">• 业务异常与外部接口故障实时暴露告警</text>
+                    <text x="282" y="381" font-size="9" fill="#334155">• 叠加定时对账补偿，实现快速感知处置</text>
+                </svg>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- =========================================================
+     模块 08：系统演示、测试环境及账号（PPT 第 8 页）
+     ========================================================= -->
+<div class="slide-card" id="slide8">
+    <div class="slide-header">
+        <div class="badge badge-highlight">模块 08 · PPT 第 8 页</div>
+        <div class="slide-title">八、系统演示、测试环境及账号</div>
+        <div class="slide-subtitle">UAT 可演示三端环境地址与测试账号清单（支持一键复制账号密码） · 推荐 3~5 分钟现场标准演示动线</div>
+    </div>
+
+    <div class="content-vertical">
+        <!-- 1. UAT测试环境信息表 -->
+        <div class="panel panel-white">
+            <div class="ba-head ba-exam">
+                <span>🖥️ 1. 可演示测试环境信息（UAT 三端门户与账号）</span>
+                <span style="font-size: 12px;">点击右侧「复制」可快速粘贴登录演示</span>
+            </div>
+            <table class="sub-table ba-table">
+                <thead>
+                    <tr>
+                        <th style="width: 13%;">端类型</th>
+                        <th style="width: 7%;">环境</th>
+                        <th style="width: 36%;">访问地址</th>
+                        <th style="width: 18%;">测试账号</th>
+                        <th style="width: 12%;">登录密码</th>
+                        <th style="width: 14%;">备注说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><b>PC 端门户</b></td>
+                        <td><span class="metric-badge">UAT</span></td>
+                        <td>
+                            <a class="env-link" href="https://ewphlp-uat.cignacmbhealth.com/pc-web/newewp/#/common-login" target="_blank" rel="noopener">https://ewphlp-uat.cignacmbhealth.com/pc-web/newewp/#/common-login</a>
+                            <button class="copy-btn" onclick="copyText('https://ewphlp-uat.cignacmbhealth.com/pc-web/newewp/#/common-login', this)">复制链接</button>
+                        </td>
+                        <td>
+                            <b>U26015</b> <button class="copy-btn" onclick="copyText('U26015', this)">复制</button><br/>
+                            <span style="color: #475569; font-size: 12px;">备选：U26016 / U26012</span>
+                        </td>
+                        <td>
+                            <b>Aa@123456</b>
+                            <button class="copy-btn" onclick="copyText('Aa@123456', this)">复制</button>
+                        </td>
+                        <td>3 个通用演示账号，可直接登录演示企业体检全流程</td>
+                    </tr>
+                    <tr>
+                        <td><b>移动端 H5</b></td>
+                        <td><span class="metric-badge">UAT</span></td>
+                        <td>
+                            <a class="env-link" href="https://ewphlp-uat.cignacmbhealth.com/mb-web/newewp/#/common-login" target="_blank" rel="noopener">https://ewphlp-uat.cignacmbhealth.com/mb-web/newewp/#/common-login</a>
+                            <button class="copy-btn" onclick="copyText('https://ewphlp-uat.cignacmbhealth.com/mb-web/newewp/#/common-login', this)">复制链接</button>
+                        </td>
+                        <td>
+                            <b>U26015</b> <button class="copy-btn" onclick="copyText('U26015', this)">复制</button><br/>
+                            <span style="color: #475569; font-size: 12px;">备选：U26016 / U26012</span>
+                        </td>
+                        <td>
+                            <b>Aa@123456</b>
+                            <button class="copy-btn" onclick="copyText('Aa@123456', this)">复制</button>
+                        </td>
+                        <td>与 PC 端共用演示账号，支持手机/浏览器移动模式演示</td>
+                    </tr>
+                    <tr>
+                        <td><b>MIS 运营后台</b></td>
+                        <td><span class="tag-amber">UAT内网</span></td>
+                        <td>
+                            <a class="env-link" href="https://10.142.126.86:64885/pc-web/mis/index.html" target="_blank" rel="noopener">https://10.142.126.86:64885/pc-web/mis/index.html</a>
+                            <button class="copy-btn" onclick="copyText('https://10.142.126.86:64885/pc-web/mis/index.html', this)">复制链接</button>
+                        </td>
+                        <td>
+                            <b>SZK260009</b>
+                            <button class="copy-btn" onclick="copyText('SZK260009', this)">复制</button>
+                        </td>
+                        <td><span class="subdomain-tag">Jeck 已提供</span></td>
+                        <td>内网访问，用于展示后台企业配置、名单导入与报销/公立审核</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 2. 推荐现场演示脚本 + 演示动线图 -->
+        <div class="content-grid">
+            <div class="panel">
+                <div class="panel-title">
+                    <span>🎬 2. 推荐现场演示脚本（约 3~5 分钟）</span>
+                    <span class="tag-new">4 步标准演示路径</span>
+                </div>
+                <ul class="bullet-list">
+                    <li><b>步骤 1 · 登录与权益总览：</b>使用 <span class="subdomain-tag">U26015</span>（密码 <span class="subdomain-tag">Aa@123456</span>）登录 UAT PC 门户，重点展示<b>企业多租户主题换肤、员工可用体检权益卡片与福利积分余额</b>。</li>
+                    <li><b>步骤 2 · 核心预约体验：</b>进入体检预约流程 → 展示<b>套餐选择（主套餐 / 升级 / 加项选购与性别婚否适检过滤）</b> → 重点展示“<b>套餐与分院交集匹配</b>”能力及机构排期日历选择。</li>
+                    <li><b>步骤 3 · 家属与积分亮点：</b>进入家属体检专区 → 展示<b>家属产品包（G）选购、多持有人购物车合并结算与 1:1 福利积分抵扣优先级分摊</b>效果。</li>
+                    <li><b>步骤 4 · 报销与报告闭环：</b>切换展示<b>常规报销 / 积分报销提交页面（外院发票上传 + 收款银行卡维护）</b>，以及检后<b>已出体检报告查阅与小诺健康 AI / 专科医生解读视图</b>。</li>
+                </ul>
+            </div>
+
+            <div class="panel">
+                <div class="panel-title">
+                    <span>📐 【3~5 分钟现场演示核心看点动线图】</span>
+                    <span class="metric-badge">推荐账号：U26015</span>
+                </div>
+                <div class="svg-container" style="min-height: 250px;">
+                    <svg width="100%" height="100%" viewBox="0 0 520 250" style="max-width: 100%; display: block;">
+                        <!-- Step 1 -->
+                        <rect x="16" y="16" width="224" height="92" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="128" y="38" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">Step 1 · 登录与权益总览 (~1 min)</text>
+                        <line x1="28" y1="46" x2="228" y2="46" stroke="#bfdbfe"/>
+                        <text x="128" y="66" font-size="9.5" fill="#334155" text-anchor="middle">U26015 登录 UAT PC 门户</text>
+                        <text x="128" y="84" font-size="9.2" fill="#0066cc" text-anchor="middle">看点：多租户皮肤 · 体检权益 · 积分余额</text>
+
+                        <line x1="240" y1="62" x2="276" y2="62" stroke="#0066cc" stroke-width="2" marker-end="url(#arr-blue)"/>
+
+                        <!-- Step 2 -->
+                        <rect x="278" y="16" width="226" height="92" rx="8" fill="#eff6ff" stroke="#2563eb" stroke-width="1.8"/>
+                        <text x="391" y="38" font-size="11" font-weight="bold" fill="#1e40af" text-anchor="middle">Step 2 · 核心预约体验 (~1.5 min)</text>
+                        <line x1="290" y1="46" x2="492" y2="46" stroke="#bfdbfe"/>
+                        <text x="391" y="66" font-size="9.5" fill="#334155" text-anchor="middle">主套餐/升级/加项 + 适检过滤</text>
+                        <text x="391" y="84" font-size="9.2" fill="#0066cc" text-anchor="middle">看点：套餐↔分院交集匹配 &amp; 排期日历</text>
+
+                        <!-- Step 2 -> Step 3 向下连线 -->
+                        <path d="M 391 108 L 391 126 L 128 126 L 128 142" fill="none" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <!-- Step 3 -->
+                        <rect x="16" y="144" width="224" height="92" rx="8" fill="#f0fdf4" stroke="#16a34a" stroke-width="1.8"/>
+                        <text x="128" y="166" font-size="11" font-weight="bold" fill="#166534" text-anchor="middle">Step 3 · 家属与积分亮点 (~1 min)</text>
+                        <line x1="28" y1="174" x2="228" y2="174" stroke="#bbf7d0"/>
+                        <text x="128" y="194" font-size="9.5" fill="#334155" text-anchor="middle">家属产品包(G) + 多人购物车合单</text>
+                        <text x="128" y="212" font-size="9.2" fill="#15803d" text-anchor="middle">看点：1:1 积分共济抵扣分摊效果</text>
+
+                        <line x1="240" y1="190" x2="276" y2="190" stroke="#16a34a" stroke-width="2" marker-end="url(#arr-green)"/>
+
+                        <!-- Step 4 -->
+                        <rect x="278" y="144" width="226" height="92" rx="8" fill="#ecfdf5" stroke="#10b981" stroke-width="2"/>
+                        <text x="391" y="166" font-size="11" font-weight="bold" fill="#047857" text-anchor="middle">Step 4 · 报销与报告闭环 (~1 min)</text>
+                        <line x1="290" y1="174" x2="492" y2="174" stroke="#a7f3d0"/>
+                        <text x="391" y="194" font-size="9.5" fill="#334155" text-anchor="middle">常规/积分报销（传发票+绑银行卡）</text>
+                        <text x="391" y="212" font-size="9.2" fill="#047857" text-anchor="middle">看点：体检报告结构化查阅 &amp; AI解读</text>
+                    </svg>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 底部翻页栏 -->
+<div class="footer-nav">
+    <button class="footer-btn" id="footPrev" onclick="prevSlide()">◀ 上一页</button>
+    <span style="font-size: 13px; color: var(--text-muted);">提示：可点击上方 8 大模块标签或使用键盘左右方向键 (← / →) 翻页 ｜ 全站文字采用微软雅黑</span>
+    <button class="footer-btn" id="footNext" onclick="nextSlide()">下一页 ▶</button>
+</div>
+
+<script>
+let currentSlide = 1;
+const totalSlides = 8;
+
+function showSlide(index) {
+    if (index < 1) index = 1;
+    if (index > totalSlides) index = totalSlides;
+    currentSlide = index;
+
+    document.querySelectorAll('.slide-card').forEach(slide => {
+        slide.classList.remove('active');
+    });
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+
+    const targetSlide = document.getElementById('slide' + index);
+    if (targetSlide) {
+        targetSlide.classList.add('active');
+    }
+
+    const targetBtn = document.querySelector(`.tab-btn[data-slide="${index}"]`);
+    if (targetBtn) {
+        targetBtn.classList.add('active');
+        try {
+            targetBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        } catch (e) {}
+    }
+
+    const counter = document.getElementById('slideCounter');
+    if (counter) {
+        counter.textContent = currentSlide + ' / ' + totalSlides;
+    }
+
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const footPrev = document.getElementById('footPrev');
+    const footNext = document.getElementById('footNext');
+
+    if (prevBtn) prevBtn.disabled = (currentSlide === 1);
+    if (nextBtn) nextBtn.disabled = (currentSlide === totalSlides);
+    if (footPrev) footPrev.disabled = (currentSlide === 1);
+    if (footNext) footNext.disabled = (currentSlide === totalSlides);
+}
+
+function nextSlide() {
+    if (currentSlide < totalSlides) {
+        showSlide(currentSlide + 1);
+    }
+}
+
+function prevSlide() {
+    if (currentSlide > 1) {
+        showSlide(currentSlide - 1);
+    }
+}
+
+function showScenario(scId) {
+    document.querySelectorAll('.scenario-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-sc') === scId);
+    });
+    document.querySelectorAll('.scenario-pane').forEach(pane => {
+        if (scId === 'all') {
+            pane.classList.add('active');
+            pane.style.marginBottom = '18px';
+        } else {
+            pane.classList.toggle('active', pane.id === scId);
+            pane.style.marginBottom = '0';
+        }
+    });
+}
+
+function copyText(text, btnEl) {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(text).then(() => markCopied(btnEl)).catch(() => fallbackCopy(text, btnEl));
+    } else {
+        fallbackCopy(text, btnEl);
+    }
+}
+
+function fallbackCopy(text, btnEl) {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand('copy'); markCopied(btnEl); } catch (e) {}
+    document.body.removeChild(ta);
+}
+
+function markCopied(btnEl) {
+    if (!btnEl) return;
+    const orig = btnEl.textContent;
+    btnEl.textContent = '已复制';
+    btnEl.classList.add('copied');
+    setTimeout(() => {
+        btnEl.textContent = orig;
+        btnEl.classList.remove('copied');
+    }, 1500);
+}
+
+document.addEventListener('keydown', function(e) {
+    if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') {
+        nextSlide();
+    } else if (e.key === 'ArrowLeft' || e.key === 'PageUp') {
+        prevSlide();
+    }
+});
+
+window.onload = function() {
+    showSlide(1);
+};
+</script>
+</body>
+</html>
